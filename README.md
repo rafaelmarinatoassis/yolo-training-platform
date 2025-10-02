@@ -1,355 +1,460 @@
-# YOLO Training Platform
+# 🚀 YOLO Training Platform
 
-Uma plataforma web completa para gerenciar datasets, treinar modelos YOLO (YOLOv8) e executar testes de inferência com interface web moderna e monitoramento em tempo real.
+<div align="center">
 
-## 🚀 Funcionalidades
+![YOLO Training Platform](https://img.shields.io/badge/YOLO-Training%20Platform-blue?style=for-the-badge&logo=artificial-intelligence)
+![Python](https://img.shields.io/badge/Python-3.8+-green?style=for-the-badge&logo=python)
+![Flask](https://img.shields.io/badge/Flask-2.3+-red?style=for-the-badge&logo=flask)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple?style=for-the-badge&logo=bootstrap)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
-- **Gerenciamento de Datasets**: Upload, organização e validação de datasets YOLO
-- **Treinamento de Modelos**: Treinamento YOLOv8 com monitoramento em tempo real
-- **Testes e Inferência**: Suporte para imagens, vídeos, diretórios e webcam
-- **Interface Web Moderna**: Dashboard responsivo com Bootstrap
-- **Monitoramento em Tempo Real**: WebSocket para atualizações de métricas
-- **API RESTful**: API completa para integração
-- **Docker**: Containerização completa para deploy fácil
+**Plataforma web completa para treinamento de modelos YOLO com dashboard em tempo real**
 
-## 📋 Requisitos
+[🎯 Características](#-características) • [🚀 Instalação](#-instalação) • [📖 Como Usar](#-como-usar) • [🎨 Screenshots](#-screenshots) • [🤝 Contribuir](#-contribuir)
 
-### Desenvolvimento
-- Python 3.10.11+
-- 8GB+ RAM (recomendado)
-- GPU compatível com CUDA (opcional, mas recomendado)
+</div>
 
-### Produção
-- Docker & Docker Compose
-- 16GB+ RAM (recomendado)
-- GPU com drivers NVIDIA (opcional)
+---
 
-## 🛠️ Instalação
+## 📋 Sobre o Projeto
 
-### Desenvolvimento Local
+O **YOLO Training Platform** é uma plataforma web moderna e intuitiva para treinar modelos de detecção de objetos YOLO (You Only Look Once). Desenvolvida para tornar o machine learning acessível tanto para iniciantes quanto para especialistas, oferece uma interface visual completa com monitoramento em tempo real.
 
-1. **Clone o repositório**
-```bash
-git clone <repository-url>
-cd yolo-training-platform
+### 🎯 Características
+
+- ✅ **Interface Web Moderna**: Interface Bootstrap 5 responsiva e intuitiva
+- ✅ **Dashboard em Tempo Real**: Monitoramento live de métricas de treinamento
+- ✅ **Gestão de Datasets**: Upload, validação e organização de conjuntos de dados
+- ✅ **Integração YOLOv8**: Suporte completo aos modelos YOLO mais recentes
+- ✅ **Métricas Educativas**: Explicações claras sobre Loss, mAP50, Precisão e Recall
+- ✅ **WebSocket Live**: Atualizações em tempo real via WebSocket
+- ✅ **Histórico Completo**: Acompanhamento de todos os treinamentos realizados
+- ✅ **Navegação Intuitiva**: Fluxo de trabalho otimizado e fácil de usar
+
+### 🏗️ Arquitetura
+
+```
+yolo-training-platform/
+├── app/                          # Aplicação principal
+│   ├── models.py                # Modelos de dados SQLAlchemy
+│   ├── __init__.py              # Configuração da aplicação Flask
+│   ├── routes/                  # Rotas da aplicação
+│   │   ├── ui.py               # Rotas da interface web
+│   │   ├── datasets.py         # API de datasets
+│   │   └── trainings.py        # API de treinamentos
+│   ├── services/               # Serviços de negócio
+│   │   ├── trainer.py          # Serviço de treinamento YOLO
+│   │   ├── storage.py          # Gerenciamento de arquivos
+│   │   └── infer.py           # Inferência de modelos
+│   └── templates/              # Templates HTML
+│       ├── base.html          # Template base
+│       ├── index.html         # Página inicial
+│       ├── training_dashboard.html  # Dashboard principal
+│       └── ...                # Outras páginas
+├── data/                       # Dados do projeto
+│   ├── datasets/              # Datasets organizados
+│   ├── models/                # Modelos treinados
+│   └── tests/                 # Testes realizados
+├── instance/                   # Banco de dados SQLite
+├── requirements.txt           # Dependências Python
+└── run.py                    # Ponto de entrada da aplicação
 ```
 
-2. **Crie um ambiente virtual**
+## 🚀 Instalação
+
+### Pré-requisitos
+
+- Python 3.8 ou superior
+- Git
+- 4GB+ de RAM recomendado
+- GPU NVIDIA (opcional, mas recomendado para treinamentos rápidos)
+
+#### ✅ **Verificar se você tem os pré-requisitos instalados:**
+
 ```bash
-python -m venv .venv
-source .venv/bin/activate  # Linux/Mac
+# Verificar se Python está instalado
+python --version
 # ou
-.venv\Scripts\activate     # Windows
+python3 --version
+
+# Verificar se Git está instalado
+git --version
 ```
 
-3. **Instale as dependências**
+**❌ Se algum comando não funcionar:**
+- **Python**: Baixe em [python.org](https://www.python.org/downloads/) (marque "Add to PATH")
+- **Git**: Baixe em [git-scm.com](https://git-scm.com/downloads)
+
+### Instalação Rápida
+
 ```bash
+# 1. Clone o repositório
+git clone https://github.com/rafaelmarinatoassis/yolo-training-platform.git
+cd yolo-training-platform
+
+# 2. Crie e ative um ambiente virtual
+python -m venv .venv
+
+# Windows (PowerShell)
+.venv\Scripts\Activate.ps1
+
+# Windows (CMD)
+.venv\Scripts\activate.bat
+
+# Linux/Mac
+source .venv/bin/activate
+
+# 3. Instale as dependências
 pip install -r requirements.txt
+
+# 4. Execute a aplicação
+python run.py
 ```
 
-4. **Configure as variáveis de ambiente**
+### Instalação Detalhada
+
+<details>
+<summary>Clique para ver instruções detalhadas</summary>
+
+#### 1. Preparação do Ambiente
+
 ```bash
-cp .env.example .env
-# Edite o arquivo .env conforme necessário
+# Verificar versão do Python
+python --version
+
+# Criar ambiente virtual
+python -m venv .venv
+
+# Ativar ambiente virtual
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+
+# Windows CMD
+.venv\Scripts\activate.bat
+
+# Linux/Mac
+source .venv/bin/activate
 ```
 
-5. **Execute a aplicação**
+#### 2. Instalação de Dependências
+
+```bash
+# Atualizar pip
+python -m pip install --upgrade pip
+
+# Instalar dependências
+pip install -r requirements.txt
+
+# Verificar instalação
+pip list
+```
+
+#### 3. Configuração do Banco de Dados
+
+```bash
+# O banco SQLite será criado automaticamente na primeira execução
+# Localizado em: instance/yolo_trainer.db
+```
+
+#### 4. Estrutura de Diretórios
+
+```bash
+# Criar diretórios necessários (automático)
+mkdir -p data/datasets data/models data/tests
+```
+
+</details>
+
+### ⚡ **Início Rápido (Para Iniciantes)**
+
+1. **Baixe e instale Python** em [python.org](https://www.python.org/downloads/) (marque "Add to PATH")
+2. **Baixe e instale Git** em [git-scm.com](https://git-scm.com/downloads)
+3. **Abra o Terminal/PowerShell** e execute os comandos da seção "Instalação Rápida"
+4. **Aguarde as instalações** (pode demorar alguns minutos)
+5. **Acesse** http://localhost:5000 no seu navegador
+
+**💡 Primeira vez usando?** Não se preocupe! O processo é automatizado e a interface é intuitiva.
+
+## 📖 Como Usar
+
+### 1. Iniciando a Aplicação
+
 ```bash
 python run.py
 ```
 
-A aplicação estará disponível em `http://localhost:5000`
+🌐 **Acesse:** `http://localhost:5000`
 
-### Deploy com Docker
+**⚠️ Importante:** Mantenha o terminal aberto enquanto usa a aplicação!
 
-1. **Clone o repositório**
-```bash
-git clone <repository-url>
-cd yolo-training-platform
-```
+### 2. Fluxo de Trabalho
 
-2. **Configure as variáveis de ambiente**
-```bash
-cp .env.example .env
-# Edite o arquivo .env para produção
-```
+#### 📁 **Passo 1: Criar Dataset**
+1. Acesse "Criar Dataset" na página inicial
+2. Faça upload das imagens e labels
+3. Configure as classes de detecção
+4. Valide o dataset
 
-3. **Execute com Docker Compose**
-```bash
-docker-compose up -d
-```
+#### 🎯 **Passo 2: Configurar Treinamento**
+1. Vá para "Treinamento" no menu
+2. Selecione o dataset criado
+3. Configure parâmetros:
+   - Número de épocas
+   - Batch size
+   - Tamanho da imagem
+   - Modelo base (YOLOv8n, YOLOv8m, etc.)
 
-A aplicação estará disponível em `http://localhost`
+#### 📊 **Passo 3: Monitorar Dashboard**
+1. Após iniciar o treinamento, acesse o dashboard
+2. Acompanhe métricas em tempo real:
+   - **Loss**: Erro do modelo (menor = melhor)
+   - **mAP50**: Precisão principal (maior = melhor)
+   - **Precisão**: Detecções corretas / Total detectado
+   - **Recall**: Objetos encontrados / Total existente
 
-## 🏗️ Estrutura do Projeto
+#### 📈 **Passo 4: Analisar Resultados**
+1. Visualize gráficos de progresso
+2. Analise métricas finais
+3. Baixe o modelo treinado
+4. Teste com novas imagens
 
-```
-project/
-├── app/                    # Código principal da aplicação
-│   ├── __init__.py        # Factory da aplicação Flask
-│   ├── models.py          # Modelos SQLAlchemy
-│   ├── routes/            # Blueprints das rotas
-│   │   ├── datasets.py    # API de datasets
-│   │   ├── trainings.py   # API de treinamentos
-│   │   ├── tests.py       # API de testes
-│   │   └── ui.py          # Rotas da interface web
-│   ├── services/          # Serviços de negócio
-│   │   ├── storage.py     # Gerenciamento de arquivos
-│   │   ├── trainer.py     # Serviço de treinamento
-│   │   └── infer.py       # Serviço de inferência
-│   ├── templates/         # Templates HTML Jinja2
-│   └── static/           # Arquivos estáticos (CSS, JS)
-├── data/                 # Dados da aplicação
-│   ├── datasets/         # Datasets organizados
-│   ├── models/           # Modelos treinados
-│   └── tests/            # Resultados de testes
-├── docker-compose.yml    # Orquestração Docker
-├── Dockerfile           # Imagem Docker
-├── requirements.txt     # Dependências Python
-├── run.py              # Script principal
-└── README.md           # Este arquivo
-```
+### 3. Interface Principal
 
-## 🎯 Como Usar
+#### 🏠 Dashboard Principal
+- Cards informativos com métricas atuais
+- Explicações educativas de cada métrica
+- Histórico de épocas em tabela
+- Indicador de conexão em tempo real
 
-### 1. Criar um Dataset
+#### 📊 Página de Detalhes
+- Gráficos interativos Chart.js
+- Métricas completas por época
+- Visualizações do YOLO (curvas F1, P, R)
+- Logs de treinamento em tempo real
 
-1. Acesse "Criar Dataset" na sidebar
-2. Defina o nome e classes do dataset
-3. Faça upload dos arquivos:
-   - **Train**: Imagens e labels obrigatórios
-   - **Validation**: Imagens e labels obrigatórios
-   - **Test**: Opcional
-4. O sistema validará e gerará o arquivo YAML automaticamente
+#### 📋 Lista de Treinamentos
+- Histórico completo de treinamentos
+- Filtros por status e dataset
+- Ações rápidas (cancelar, baixar, deletar)
+- Estatísticas resumidas
 
-**Formato dos arquivos:**
-- Imagens: ZIP com .jpg, .jpeg, .png, .bmp
-- Labels: ZIP com .txt no formato YOLO (class x_center y_center width height)
+## 🎨 Screenshots
 
-### 2. Treinar um Modelo
+### Dashboard Principal
+![Dashboard](docs/screenshots/dashboard.png)
+*Dashboard em tempo real com métricas explicadas*
 
-1. Acesse "Treinamento" na sidebar
-2. Selecione o dataset
-3. Configure os parâmetros:
-   - Épocas, batch size, learning rate
-   - Data augmentation, early stopping
-4. Inicie o treinamento
-5. Monitore o progresso em tempo real
+### Página de Treinamento
+![Training](docs/screenshots/training.png)
+*Configuração de parâmetros de treinamento*
 
-### 3. Testar um Modelo
+### Gestão de Datasets
+![Datasets](docs/screenshots/datasets.png)
+*Interface de upload e gestão de datasets*
 
-1. Acesse "Testar Modelo" na sidebar
-2. Selecione o modelo treinado
-3. Escolha o tipo de entrada:
-   - **Imagem**: Upload de imagem única
-   - **Vídeo**: Upload de arquivo de vídeo
-   - **Diretório**: ZIP com múltiplas imagens
-   - **Webcam**: Teste em tempo real
-4. Configure os parâmetros de inferência
-5. Execute o teste e visualize os resultados
+## 🛠️ Tecnologias Utilizadas
 
-## 🔧 API REST
+### Backend
+- **Flask 2.3+**: Framework web Python
+- **SQLAlchemy**: ORM para banco de dados
+- **Flask-SocketIO**: WebSocket para tempo real
+- **Ultralytics YOLOv8**: Framework de detecção de objetos
+- **pandas**: Manipulação de dados CSV
+- **Pillow**: Processamento de imagens
 
-### Datasets
+### Frontend
+- **Bootstrap 5.3**: Framework CSS responsivo
+- **Chart.js 3.x**: Gráficos interativos
+- **Bootstrap Icons**: Ícones modernos
+- **Socket.IO Client**: Cliente WebSocket
+- **JavaScript ES6**: Interatividade moderna
 
-- `GET /api/datasets` - Listar datasets
-- `POST /api/datasets` - Criar dataset
-- `GET /api/datasets/{id}` - Detalhes do dataset
-- `PUT /api/datasets/{id}` - Atualizar dataset
-- `DELETE /api/datasets/{id}` - Deletar dataset
-- `GET /api/datasets/{id}/yaml` - Obter YAML do dataset
+### Infraestrutura
+- **SQLite**: Banco de dados local
+- **Virtual Environment**: Isolamento de dependências
+- **CORS**: Suporte para requisições cross-origin
 
-### Treinamentos
-
-- `GET /api/trainings` - Listar treinamentos
-- `POST /api/trainings` - Criar treinamento
-- `GET /api/trainings/{id}` - Detalhes do treinamento
-- `POST /api/trainings/{id}/cancel` - Cancelar treinamento
-- `GET /api/trainings/{id}/metrics` - Métricas do treinamento
-- `DELETE /api/trainings/{id}` - Deletar treinamento
-
-### Testes
-
-- `GET /api/tests` - Listar testes
-- `POST /api/tests` - Criar teste
-- `GET /api/tests/{id}` - Detalhes do teste
-- `GET /api/tests/{id}/results` - Resultados do teste
-- `DELETE /api/tests/{id}` - Deletar teste
-
-## ⚙️ Configuração
+## ⚙️ Configuração Avançada
 
 ### Variáveis de Ambiente
 
 ```bash
-# Flask
+# .env (opcional)
 FLASK_ENV=development
-SECRET_KEY=your-secret-key
-DEBUG=True
-
-# Database
-DATABASE_URL=sqlite:///yolo_trainer.db
-
-# Storage
+FLASK_DEBUG=True
+SECRET_KEY=sua-chave-secreta-aqui
 DATA_ROOT=data
-MAX_UPLOAD_SIZE=2147483648  # 2GB
-
-# Redis (opcional)
-REDIS_URL=redis://localhost:6379/0
-
-# Training
-MAX_CONCURRENT_TRAININGS=2
-DEFAULT_EPOCHS=100
-DEFAULT_BATCH_SIZE=16
-DEFAULT_IMG_SIZE=640
-
-# Server
-HOST=0.0.0.0
-PORT=5000
+MAX_UPLOAD_SIZE=100MB
 ```
 
-### Banco de Dados
-
-A aplicação usa SQLite por padrão para desenvolvimento. Para produção, recomenda-se PostgreSQL:
+### Configuração de GPU
 
 ```bash
-DATABASE_URL=postgresql://user:password@localhost/yolo_trainer
+# Para usar GPU NVIDIA (opcional)
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
 ```
 
-### Redis (Opcional)
+### Configuração de Produção
 
-Para monitoramento em tempo real e filas de trabalho em produção:
+<details>
+<summary>Deploy para produção</summary>
 
 ```bash
-REDIS_URL=redis://localhost:6379/0
+# Instalar servidor WSGI
+pip install gunicorn
+
+# Executar com Gunicorn
+gunicorn -w 4 -b 0.0.0.0:5000 run:app
+
+# Ou com Docker (Dockerfile incluído)
+docker build -t yolo-training-platform .
+docker run -p 5000:5000 yolo-training-platform
 ```
 
-## 🐳 Docker
+</details>
 
-### Desenvolvimento
-
-```bash
-# Build e run com hot reload
-docker-compose -f docker-compose.dev.yml up --build
-```
-
-### Produção
-
-```bash
-# Deploy completo com Nginx, Redis e Worker
-docker-compose up -d
-```
-
-### Serviços Docker
-
-- **app**: Aplicação Flask principal
-- **redis**: Cache e filas de trabalho
-- **worker**: Processamento assíncrono de treinamentos
-- **nginx**: Proxy reverso e servidor de arquivos estáticos
-
-## 📊 Monitoramento
-
-### Logs
-
-```bash
-# Ver logs da aplicação
-docker-compose logs -f app
-
-# Ver logs do worker
-docker-compose logs -f worker
-
-# Ver logs do nginx
-docker-compose logs -f nginx
-```
-
-### Métricas
-
-A aplicação expõe métricas via WebSocket em tempo real:
-- Status de treinamentos
-- Progresso de épocas
-- Loss e mAP em tempo real
-- Logs de treinamento
-
-## 🔒 Segurança
-
-### Produção
-
-1. **Altere a SECRET_KEY**
-2. **Configure HTTPS** com certificados SSL
-3. **Use PostgreSQL** em vez de SQLite
-4. **Configure firewall** para portas necessárias
-5. **Limite upload de arquivos** conforme necessário
-6. **Configure backup** dos dados importantes
-
-### Rate Limiting
-
-O Nginx está configurado com rate limiting:
-- API geral: 10 req/s
-- Upload: 1 req/s
-- Burst permitido para picos
-
-## 🐛 Troubleshooting
+## 🐛 Solução de Problemas
 
 ### Problemas Comuns
 
-1. **Erro de memória durante treinamento**
-   - Reduza o batch size
-   - Verifique RAM disponível
-   - Use GPU se disponível
-
-2. **Upload falha**
-   - Verifique MAX_UPLOAD_SIZE
-   - Confirme formato dos arquivos
-   - Verifique espaço em disco
-
-3. **WebSocket não conecta**
-   - Verifique porta 5000
-   - Confirme configuração do CORS
-   - Teste sem proxy/firewall
-
-4. **Modelo não treina**
-   - Verifique dataset YAML
-   - Confirme labels no formato correto
-   - Verifique logs de erro
-
-### Debug
+<details>
+<summary>❌ Erro de import do ultralytics</summary>
 
 ```bash
-# Ativar debug mode
-export DEBUG=True
+# Reinstalar ultralytics
+pip uninstall ultralytics
+pip install ultralytics
 
-# Ver logs detalhados
-export FLASK_ENV=development
-
-# Verificar status dos containers
-docker-compose ps
-
-# Verificar logs específicos
-docker-compose logs app
+# Verificar instalação
+python -c "import ultralytics; print(ultralytics.__version__)"
 ```
 
-## 🤝 Contribuição
+</details>
 
-1. Fork o projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
-5. Abra um Pull Request
+<details>
+<summary>❌ WebSocket não conecta</summary>
 
-## 📝 Licença
+```bash
+# Verificar se eventlet está instalado
+pip install eventlet
 
-Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICENSE) para detalhes.
+# Verificar portas disponíveis
+netstat -an | findstr :5000
+```
+
+</details>
+
+<details>
+<summary>❌ Upload de dataset falha</summary>
+
+```bash
+# Verificar estrutura de diretórios
+ls -la data/datasets/
+
+# Verificar permissões
+chmod -R 755 data/
+```
+
+</details>
+
+### Logs de Debug
+
+```bash
+# Executar em modo debug
+FLASK_DEBUG=True python run.py
+
+# Logs detalhados no console
+```
+
+## 🤝 Contribuir
+
+Contribuições são sempre bem-vindas! Veja como você pode ajudar:
+
+### 1. Reportar Bugs
+- Use a aba [Issues](https://github.com/rafaelmarinatoassis/yolo-training-platform/issues)
+- Descreva o problema detalhadamente
+- Inclua logs e screenshots se possível
+
+### 2. Sugerir Melhorias
+- Abra um [Feature Request](https://github.com/rafaelmarinatoassis/yolo-training-platform/issues/new)
+- Explique o benefício da funcionalidade
+- Forneça exemplos de uso
+
+### 3. Contribuir com Código
+
+```bash
+# 1. Fork o repositório
+# 2. Crie uma branch para sua feature
+git checkout -b feature/nova-funcionalidade
+
+# 3. Commit suas mudanças
+git commit -m "feat: adiciona nova funcionalidade"
+
+# 4. Push para a branch
+git push origin feature/nova-funcionalidade
+
+# 5. Abra um Pull Request
+```
+
+### 4. Padrões de Commit
+
+```bash
+feat: nova funcionalidade
+fix: correção de bug
+docs: documentação
+style: formatação
+refactor: refatoração
+test: testes
+chore: manutenção
+```
+
+## 📝 Roadmap
+
+### 🔮 Versão 2.0
+- [ ] Suporte a outros modelos (Detectron2, EfficientDet)
+- [ ] Deploy automático via Docker
+- [ ] API REST completa
+- [ ] Autenticação de usuários
+- [ ] Compartilhamento de modelos
+
+### 🎯 Versão 1.5
+- [ ] Suporte a vídeos
+- [ ] Anotação integrada
+- [ ] Exportação para diferentes formatos
+- [ ] Métricas avançadas
+- [ ] Relatórios PDF
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+```
+MIT License
+
+Copyright (c) 2025 YOLO Training Platform
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction...
+```
+
+## 👥 Autores
+
+- **Rafael Marina** - *Desenvolvimento inicial* - [@rafaelmarinatoassis](https://github.com/rafaelmarinatoassis)
 
 ## 🙏 Agradecimentos
 
-- [Ultralytics](https://github.com/ultralytics/ultralytics) - Framework YOLO
-- [Flask](https://flask.palletsprojects.com/) - Framework web
-- [Bootstrap](https://getbootstrap.com/) - Framework CSS
-- [Socket.IO](https://socket.io/) - Comunicação em tempo real
-
-## 📞 Suporte
-
-Para suporte, abra uma issue no GitHub ou entre em contato através do email: support@yolo-trainer.com
+- [Ultralytics](https://ultralytics.com/) pelo framework YOLOv8
+- [Flask](https://flask.palletsprojects.com/) pela base web
+- [Bootstrap](https://getbootstrap.com/) pelo design responsivo
+- [Chart.js](https://www.chartjs.org/) pelos gráficos interativos
 
 ---
 
-**YOLO Training Platform** - Treine modelos YOLO com facilidade e elegância! 🚀
+<div align="center">
+
+**⭐ Se este projeto te ajudou, considere dar uma estrela!**
+
+[🐛 Reportar Bug](https://github.com/rafaelmarinatoassis/yolo-training-platform/issues) • [💡 Sugerir Feature](https://github.com/rafaelmarinatoassis/yolo-training-platform/issues) • [📖 Documentação](https://github.com/rafaelmarinatoassis/yolo-training-platform/wiki)
+
+</div>
