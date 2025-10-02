@@ -247,15 +247,16 @@ python run.py
 ## 🎨 Screenshots
 
 ### Dashboard Principal
-![Dashboard](docs/screenshots/dashboard.png)
+<img width="1899" height="825" alt="image" src="https://github.com/user-attachments/assets/5ab29c89-0d32-4262-9541-3c72601b6e99" />
 *Dashboard em tempo real com métricas explicadas*
 
 ### Página de Treinamento
-![Training](docs/screenshots/training.png)
+<img width="1902" height="910" alt="image" src="https://github.com/user-attachments/assets/13f3c9a2-9dae-4eb6-af32-c87d98cc8157" />
+<img width="1918" height="906" alt="image" src="https://github.com/user-attachments/assets/a4551754-138c-4ba1-800e-18cc4bceb720" />
 *Configuração de parâmetros de treinamento*
 
 ### Gestão de Datasets
-![Datasets](docs/screenshots/datasets.png)
+<img width="1918" height="909" alt="image" src="https://github.com/user-attachments/assets/fd79dca3-8c51-4cf8-84d5-512f44ce1158" />
 *Interface de upload e gestão de datasets*
 
 ## 🛠️ Tecnologias Utilizadas
@@ -464,7 +465,7 @@ in the Software without restriction...
 
 ## 👥 Autores
 
-- **Rafael Marina** - *Desenvolvimento inicial* - [@rafaelmarinatoassis](https://github.com/rafaelmarinatoassis)
+- **Rafael Marinato Assis** - *Desenvolvimento inicial* - [@rafaelmarinatoassis](https://github.com/rafaelmarinatoassis)
 
 ## 🙏 Agradecimentos
 
