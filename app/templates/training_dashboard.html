@@ -1,0 +1,409 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Training {{ training.id }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2><i class="fas fa-chart-line"></i> Dashboard - Training {{ training.id }}</h2>
+                <div>
+                    <a href="/training/{{ training_id }}/details" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                    <span class="badge badge-{{ 'success' if training.status == 'completed' else 'warning' if training.status == 'training' else 'info' }} fs-6">
+                        {{ training.status.title() }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Progresso do Treinamento</h5>
+                    <div class="progress mb-3" style="height: 25px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" 
+                             style="width: {{ progress }}%"
+                             aria-valuenow="{{ progress }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            {{ progress }}%
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <strong>Época Atual</strong><br>
+                            <span class="fs-3 text-primary">{{ current_epoch }}</span> / {{ training.epochs }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Tempo Decorrido</strong><br>
+                            <span class="fs-3 text-info">{{ elapsed_time }}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Tempo Estimado</strong><br>
+                            <span class="fs-3 text-warning">{{ estimated_time }}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Velocidade</strong><br>
+                            <span class="fs-3 text-success">{{ processing_speed }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Métricas em Tempo Real -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar"></i> Métricas em Tempo Real
+                        <span class="badge bg-success ms-2" id="liveIndicator">LIVE</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="metricsContainer">
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body text-center">
+                                    <h6>Training Loss</h6>
+                                    <h2 id="currentLoss">-</h2>
+                                    <small>Última atualização: <span id="lossTime">-</span></small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h6>mAP50 (%)</h6>
+                                    <h2 id="currentMap50">-</h2>
+                                    <small>Última atualização: <span id="map50Time">-</span></small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h6>Precisão (%)</h6>
+                                    <h2 id="currentPrecision">-</h2>
+                                    <small>Última atualização: <span id="precisionTime">-</span></small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body text-center">
+                                    <h6>Recall (%)</h6>
+                                    <h2 id="currentRecall">-</h2>
+                                    <small>Última atualização: <span id="recallTime">-</span></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Explicação das Métricas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle"></i> Como Interpretar as Métricas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-12 mb-3">
+                            <h6 class="text-danger"><i class="fas fa-chart-line"></i> Training Loss (Erro)</h6>
+                            <p class="mb-2"><strong>O que é:</strong> Mede o quanto o modelo está "errando" durante o treinamento.</p>
+                            <p class="mb-2"><strong>Como ler:</strong></p>
+                            <ul class="mb-2">
+                                <li><span class="badge bg-success">Diminuindo</span> = Modelo está aprendendo ✅</li>
+                                <li><span class="badge bg-warning">Estável</span> = Modelo pode ter convergido</li>
+                                <li><span class="badge bg-danger">Aumentando</span> = Possível overfitting ⚠️</li>
+                            </ul>
+                            <small class="text-muted"><strong>Meta:</strong> Valores menores são melhores (idealmente < 1.0)</small>
+                        </div>
+                        
+                        <div class="col-lg-6 col-md-12 mb-3">
+                            <h6 class="text-success"><i class="fas fa-bullseye"></i> mAP50 (Precisão Principal)</h6>
+                            <p class="mb-2"><strong>O que é:</strong> Mede a precisão geral do modelo para detectar objetos.</p>
+                            <p class="mb-2"><strong>Como ler:</strong></p>
+                            <ul class="mb-2">
+                                <li><span class="badge bg-success">> 50%</span> = Modelo muito bom ✅</li>
+                                <li><span class="badge bg-warning">30-50%</span> = Modelo razoável 👍</li>
+                                <li><span class="badge bg-danger">< 30%</span> = Precisa melhorar 📈</li>
+                            </ul>
+                            <small class="text-muted"><strong>Meta:</strong> Valores maiores são melhores (máximo 100%)</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-12 mb-3">
+                            <h6 class="text-info"><i class="fas fa-crosshairs"></i> Precisão (%)</h6>
+                            <p class="mb-2"><strong>O que é:</strong> Dos objetos que o modelo detectou, quantos estavam corretos?</p>
+                            <p class="mb-2"><strong>Como ler:</strong></p>
+                            <ul class="mb-2">
+                                <li><span class="badge bg-success">Alta precisão</span> = Poucas detecções falsas ✅</li>
+                                <li><span class="badge bg-warning">Baixa precisão</span> = Muitos falsos positivos ⚠️</li>
+                            </ul>
+                            <small class="text-muted"><strong>Exemplo:</strong> 80% = de 100 detecções, 80 estavam certas</small>
+                        </div>
+                        
+                        <div class="col-lg-6 col-md-12 mb-3">
+                            <h6 class="text-warning"><i class="fas fa-search"></i> Recall (Sensibilidade)</h6>
+                            <p class="mb-2"><strong>O que é:</strong> Dos objetos que existiam na imagem, quantos o modelo conseguiu encontrar?</p>
+                            <p class="mb-2"><strong>Como ler:</strong></p>
+                            <ul class="mb-2">
+                                <li><span class="badge bg-success">Alto recall</span> = Encontra quase tudo ✅</li>
+                                <li><span class="badge bg-warning">Baixo recall</span> = Perde muitos objetos ⚠️</li>
+                            </ul>
+                            <small class="text-muted"><strong>Exemplo:</strong> 70% = de 100 objetos reais, encontrou 70</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="alert alert-light">
+                                <h6><i class="fas fa-lightbulb text-warning"></i> Dica de Interpretação:</h6>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <strong>🎯 Modelo Ideal:</strong><br>
+                                        <small>Loss baixo, mAP50 alto, Precisão e Recall equilibrados</small>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>⚖️ Trade-off:</strong><br>
+                                        <small>Às vezes precisão alta = recall baixo e vice-versa</small>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>📈 Progresso:</strong><br>
+                                        <small>Observe as tendências ao longo das épocas</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informações do Modelo -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-cog"></i> Configuração do Modelo</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><strong>Nome:</strong></td>
+                            <td>{{ training.model_name }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dataset:</strong></td>
+                            <td>{{ training.dataset.name if training.dataset else 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Épocas Totais:</strong></td>
+                            <td>{{ training.epochs }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tamanho da Imagem:</strong></td>
+                            <td>{{ training.img_size }}px</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Batch Size:</strong></td>
+                            <td>{{ training.batch_size }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Iniciado em:</strong></td>
+                            <td>{{ training.started_at.strftime('%d/%m/%Y %H:%M:%S') if training.started_at else 'N/A' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-history"></i> Histórico de Métricas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Época</th>
+                                    <th>Loss</th>
+                                    <th>mAP50</th>
+                                    <th>Precisão</th>
+                                    <th>Recall</th>
+                                </tr>
+                            </thead>
+                            <tbody id="metricsHistory">
+                                <!-- Será preenchido via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/socket.io.min.js"></script>
+<script>
+// Dashboard em tempo real
+const trainingId = {{ training_id }};
+
+// Elementos do DOM
+const currentLoss = document.getElementById('currentLoss');
+const currentMap50 = document.getElementById('currentMap50');
+const currentPrecision = document.getElementById('currentPrecision');
+const currentRecall = document.getElementById('currentRecall');
+const lossTime = document.getElementById('lossTime');
+const map50Time = document.getElementById('map50Time');
+const precisionTime = document.getElementById('precisionTime');
+const recallTime = document.getElementById('recallTime');
+const liveIndicator = document.getElementById('liveIndicator');
+const metricsHistory = document.getElementById('metricsHistory');
+
+// Conectar ao WebSocket
+const socket = io();
+
+// Atualizar indicador de conexão
+socket.on('connect', function() {
+    console.log('Conectado ao WebSocket');
+    liveIndicator.className = 'badge bg-success ms-2';
+    liveIndicator.textContent = 'LIVE';
+});
+
+socket.on('disconnect', function() {
+    console.log('Desconectado do WebSocket');
+    liveIndicator.className = 'badge bg-danger ms-2';
+    liveIndicator.textContent = 'OFFLINE';
+});
+
+// Escutar atualizações de métricas
+socket.on('training_update', function(data) {
+    if (data.training_id === trainingId) {
+        updateMetrics(data);
+        addToHistory(data);
+    }
+});
+
+// Função para atualizar métricas em tempo real
+function updateMetrics(data) {
+    const now = new Date().toLocaleTimeString();
+    
+    if (data.loss !== undefined) {
+        currentLoss.textContent = data.loss.toFixed(4);
+        lossTime.textContent = now;
+    }
+    
+    if (data.map50 !== undefined) {
+        currentMap50.textContent = (data.map50 * 100).toFixed(2);
+        map50Time.textContent = now;
+    }
+    
+    if (data.precision !== undefined) {
+        currentPrecision.textContent = (data.precision * 100).toFixed(2);
+        precisionTime.textContent = now;
+    }
+    
+    if (data.recall !== undefined) {
+        currentRecall.textContent = (data.recall * 100).toFixed(2);
+        recallTime.textContent = now;
+    }
+    
+    // Piscar indicador LIVE
+    liveIndicator.style.animation = 'none';
+    setTimeout(() => {
+        liveIndicator.style.animation = 'pulse 2s infinite';
+    }, 100);
+}
+
+// Função para adicionar ao histórico
+function addToHistory(data) {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td>${data.epoch || '-'}</td>
+        <td>${data.loss ? data.loss.toFixed(4) : '-'}</td>
+        <td>${data.map50 ? (data.map50 * 100).toFixed(2) + '%' : '-'}</td>
+        <td>${data.precision ? (data.precision * 100).toFixed(2) + '%' : '-'}</td>
+        <td>${data.recall ? (data.recall * 100).toFixed(2) + '%' : '-'}</td>
+    `;
+    
+    // Adicionar no topo da tabela
+    metricsHistory.insertBefore(row, metricsHistory.firstChild);
+    
+    // Manter apenas as últimas 10 linhas
+    while (metricsHistory.children.length > 10) {
+        metricsHistory.removeChild(metricsHistory.lastChild);
+    }
+}
+
+// Carregar dados iniciais do CSV
+function loadInitialData() {
+    fetch(`/api/trainings/${trainingId}/csv-data`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Dados iniciais carregados:', data);
+            
+            if (data.metrics && data.metrics.length > 0) {
+                // Pegar a última métrica
+                const latest = data.metrics[data.metrics.length - 1];
+                console.log('Latest metrics:', latest);
+                console.log('Precision:', latest.precision, 'Recall:', latest.recall);
+                updateMetrics(latest);
+                
+                // Preencher histórico (últimas 10)
+                const recentMetrics = data.metrics.slice(-10).reverse();
+                metricsHistory.innerHTML = '';
+                recentMetrics.forEach(metric => {
+                    addToHistory(metric);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar dados:', error);
+        });
+}
+
+// Inicializar dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    loadInitialData();
+    
+    // Adicionar animação CSS para o indicador LIVE
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    console.log('Dashboard inicializado para training ID:', trainingId);
+});
+</script>
+{% endblock %}

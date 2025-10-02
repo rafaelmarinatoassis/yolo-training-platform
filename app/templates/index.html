@@ -1,0 +1,530 @@
+{% extends "base.html" %}
+
+{% block title %}Página Inicial - YOLO Trainer{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="hero-section text-center py-5 position-relative overflow-hidden" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%); border-radius: 20px; color: white; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+                <div class="position-absolute top-0 start-0 w-100 h-100" style="background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23ffffff" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="%23ffffff" opacity="0.1"/><circle cx="50" cy="10" r="1" fill="%23ffffff" opacity="0.1"/><circle cx="10" cy="60" r="1" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>'); opacity: 0.3;"></div>
+                <div class="position-relative">
+                    <div class="mb-4">
+                        <i class="bi bi-robot display-1 text-white" style="filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));"></i>
+                    </div>
+                    <h1 class="display-3 fw-bold mb-3" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                        YOLO Training Platform
+                    </h1>
+                    <p class="lead mb-5 fs-4" style="max-width: 600px; margin: 0 auto; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                        Plataforma completa para gerenciar datasets, treinar modelos YOLO com IA
+                    </p>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="{{ url_for('ui.create_dataset_page') }}" class="btn btn-light btn-lg px-4 py-3 rounded-pill shadow">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Criar Dataset
+                        </a>
+                        <a href="{{ url_for('ui.train_page') }}" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill shadow">
+                            <i class="bi bi-play-circle me-2"></i>
+                            Iniciar Treinamento
+                        </a>
+                        <a href="{{ url_for('ui.datasets_page') }}" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill shadow">
+                            <i class="bi bi-collection me-2"></i>
+                            Ver Datasets
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics Dashboard -->
+    <div class="row mb-5">
+        <div class="col-12 mb-4">
+            <h2 class="fw-bold text-center mb-4">
+                <i class="bi bi-graph-up text-primary me-2"></i>
+                Dashboard em Tempo Real
+            </h2>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card metric-card h-100 border-0 shadow-sm" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white;">
+                <div class="card-body text-center p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <i class="bi bi-collection display-4 opacity-75"></i>
+                        <div class="badge bg-light text-primary rounded-pill">Total</div>
+                    </div>
+                    <h2 class="card-title mb-1 fw-bold" id="datasets-count">-</h2>
+                    <p class="card-text opacity-75 mb-0">Datasets</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card metric-card h-100 border-0 shadow-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+                <div class="card-body text-center p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <i class="bi bi-play-circle display-4 opacity-75"></i>
+                        <div class="badge bg-light text-success rounded-pill">Total</div>
+                    </div>
+                    <h2 class="card-title mb-1 fw-bold" id="trainings-count">-</h2>
+                    <p class="card-text opacity-75 mb-0">Treinamentos</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card metric-card h-100 border-0 shadow-sm" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">
+                <div class="card-body text-center p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <i class="bi bi-cpu display-4 opacity-75"></i>
+                        <div class="badge bg-light text-warning rounded-pill">Ativo</div>
+                    </div>
+                    <h2 class="card-title mb-1 fw-bold" id="running-trainings">-</h2>
+                    <p class="card-text opacity-75 mb-0">Em Execução</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card metric-card h-100 border-0 shadow-sm" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white;">
+                <div class="card-body text-center p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <i class="bi bi-check-circle display-4 opacity-75"></i>
+                        <div class="badge bg-light text-info rounded-pill">Status</div>
+                    </div>
+                    <h2 class="card-title mb-1 fw-bold" id="completed-trainings">-</h2>
+                    <p class="card-text opacity-75 mb-0">Concluídos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Features Overview -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-5">
+            <h2 class="fw-bold mb-3">
+                <i class="bi bi-stars text-primary me-2"></i>
+                Funcionalidades Principais
+            </h2>
+            <p class="text-muted lead">Ferramentas profissionais para machine learning e computer vision</p>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body p-4">
+                    <div class="feature-icon mb-4">
+                        <div class="icon-wrapper bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px;">
+                            <i class="bi bi-upload display-5 text-primary"></i>
+                        </div>
+                    </div>
+                    <h5 class="card-title fw-bold mb-3">Gerenciamento de Datasets</h5>
+                    <p class="card-text text-muted mb-4">
+                        Upload inteligente e organização de datasets YOLO com validação automática.
+                        Suporte completo para splits e geração de arquivos YAML.
+                    </p>
+                    <div class="feature-tags mb-3">
+                        <span class="badge bg-primary bg-opacity-10 text-primary me-2">Validação Auto</span>
+                        <span class="badge bg-success bg-opacity-10 text-success">YAML Gen</span>
+                    </div>
+                    <a href="{{ url_for('ui.datasets_page') }}" class="btn btn-primary btn-sm rounded-pill px-3">
+                        <i class="bi bi-arrow-right me-1"></i> Explorar
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body p-4">
+                    <div class="feature-icon mb-4">
+                        <div class="icon-wrapper bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px;">
+                            <i class="bi bi-lightning display-5 text-success"></i>
+                        </div>
+                    </div>
+                    <h5 class="card-title fw-bold mb-3">Treinamento Avançado</h5>
+                    <p class="card-text text-muted mb-4">
+                        Treinamento otimizado de modelos YOLO com monitoramento em tempo real.
+                        Configuração flexível de hiperparâmetros e augmentation.
+                    </p>
+                    <div class="feature-tags mb-3">
+                        <span class="badge bg-warning bg-opacity-10 text-warning me-2">Real-time</span>
+                        <span class="badge bg-info bg-opacity-10 text-info">GPU Ready</span>
+                    </div>
+                    <a href="{{ url_for('ui.train_page') }}" class="btn btn-success btn-sm rounded-pill px-3">
+                        <i class="bi bi-play-fill me-1"></i> Treinar
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body p-4">
+                    <div class="feature-icon mb-4">
+                        <div class="icon-wrapper bg-info bg-opacity-10 d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px;">
+                            <i class="bi bi-graph-up display-5 text-info"></i>
+                        </div>
+                    </div>
+                    <h5 class="card-title fw-bold mb-3">Análise e Métricas</h5>
+                    <p class="card-text text-muted mb-4">
+                        Visualizações detalhadas de performance, gráficos interativos
+                        e histórico completo de checkpoints dos modelos.
+                    </p>
+                    <div class="feature-tags mb-3">
+                        <span class="badge bg-danger bg-opacity-10 text-danger me-2">Analytics</span>
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary">History</span>
+                    </div>
+                    <a href="{{ url_for('ui.trainings_page') }}" class="btn btn-info btn-sm rounded-pill px-3">
+                        <i class="bi bi-bar-chart me-1"></i> Analisar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Activity and System Status -->
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="bi bi-clock-history text-primary me-2"></i>
+                            Atividade Recente
+                        </h5>
+                        <a href="{{ url_for('ui.trainings_page') }}" class="btn btn-outline-primary btn-sm">
+                            Ver Todos
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body pt-3">
+                    <div id="recent-trainings">
+                        <div class="text-center text-muted py-4">
+                            <div class="spinner-border spinner-border-sm me-2"></div>
+                            Carregando atividades...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-shield-check text-success me-2"></i>
+                        Status do Sistema
+                    </h5>
+                </div>
+                <div class="card-body pt-3">
+                    <div class="status-item d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-server text-success me-2"></i>
+                            <span class="fw-medium">Servidor</span>
+                        </div>
+                        <span class="badge bg-success rounded-pill">Online</span>
+                    </div>
+                    
+                    <div class="status-item d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-robot text-info me-2"></i>
+                            <span class="fw-medium">YOLO v8</span>
+                        </div>
+                        <span class="badge bg-info rounded-pill">v8.0.196</span>
+                    </div>
+                    
+                    <div class="status-item d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-hdd text-primary me-2"></i>
+                            <span class="fw-medium">Armazenamento</span>
+                        </div>
+                        <span class="text-success fw-medium">
+                            <i class="bi bi-check-circle"></i> OK
+                        </span>
+                    </div>
+                    
+                    <div class="status-item d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-wifi text-warning me-2"></i>
+                            <span class="fw-medium">WebSocket</span>
+                        </div>
+                        <span class="text-success fw-medium" id="websocket-status">
+                            <i class="bi bi-check-circle"></i> Conectado
+                        </span>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="small text-muted text-center">
+                            <i class="bi bi-clock me-1"></i>
+                            Última atualização: <span id="last-update">agora</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+    .hover-card {
+        transition: all 0.3s ease;
+    }
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+    .metric-card {
+        transition: all 0.3s ease;
+    }
+    .metric-card:hover {
+        transform: translateY(-3px);
+    }
+    .hero-section {
+        position: relative;
+        overflow: hidden;
+    }
+    .feature-icon {
+        transition: transform 0.3s ease;
+    }
+    .hover-card:hover .feature-icon {
+        transform: scale(1.1);
+    }
+    .status-item {
+        transition: all 0.2s ease;
+    }
+    .status-item:hover {
+        background-color: #f8f9fa !important;
+        transform: translateX(5px);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDashboardData();
+        setupWebSocket();
+        updateTimestamp();
+        
+        // Update timestamp every minute
+        setInterval(updateTimestamp, 60000);
+    });
+    
+    function updateTimestamp() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('pt-BR', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        const timestampEl = document.getElementById('last-update');
+        if (timestampEl) {
+            timestampEl.textContent = timeString;
+        }
+    }
+    
+    function loadDashboardData() {
+        // Load statistics with loading states
+        setLoadingState();
+        
+        Promise.all([
+            fetch('/api/datasets').then(r => r.json()),
+            fetch('/api/trainings').then(r => r.json()),
+            fetch('/api/trainings/stats').then(r => r.json()).catch(() => ({ success: false }))
+        ]).then(([datasets, trainings, stats]) => {
+            // Update basic counts
+            document.getElementById('datasets-count').textContent = datasets.total || 0;
+            document.getElementById('trainings-count').textContent = trainings.total || 0;
+            
+            // Count running trainings
+            const runningCount = trainings.trainings ? 
+                trainings.trainings.filter(t => t.status === 'running').length : 0;
+            document.getElementById('running-trainings').textContent = runningCount;
+            
+            // Update completed trainings from stats API
+            if (stats.success) {
+                document.getElementById('completed-trainings').textContent = stats.stats.completed || 0;
+            } else {
+                const completedCount = trainings.trainings ? 
+                    trainings.trainings.filter(t => t.status === 'completed').length : 0;
+                document.getElementById('completed-trainings').textContent = completedCount;
+            }
+            
+            // Load recent trainings
+            loadRecentTrainings(trainings.trainings || []);
+            
+            // Animate numbers
+            animateNumbers();
+            
+        }).catch(error => {
+            console.error('Error loading dashboard data:', error);
+            showAlert('Erro ao carregar dados do dashboard', 'warning');
+            setErrorState();
+        });
+    }
+    
+    function setLoadingState() {
+        const elements = ['datasets-count', 'trainings-count', 'running-trainings', 'completed-trainings'];
+        elements.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.innerHTML = '<div class="spinner-border spinner-border-sm"></div>';
+            }
+        });
+    }
+    
+    function setErrorState() {
+        const elements = ['datasets-count', 'trainings-count', 'running-trainings', 'completed-trainings'];
+        elements.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = 'Erro';
+            }
+        });
+    }
+    
+    function animateNumbers() {
+        const elements = ['datasets-count', 'trainings-count', 'running-trainings', 'completed-trainings'];
+        elements.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && !isNaN(el.textContent)) {
+                const finalValue = parseInt(el.textContent);
+                animateValue(el, 0, finalValue, 1000);
+            }
+        });
+    }
+    
+    function animateValue(element, start, end, duration) {
+        const range = end - start;
+        const increment = range / (duration / 16);
+        let current = start;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= end) {
+                element.textContent = end;
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(current);
+            }
+        }, 16);
+    }
+    
+    function loadRecentTrainings(trainings) {
+        const container = document.getElementById('recent-trainings');
+        
+        if (trainings.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-inbox display-6 opacity-50"></i>
+                    <div class="mt-2">Nenhum treinamento encontrado</div>
+                    <div class="small">Inicie seu primeiro treinamento!</div>
+                </div>
+            `;
+            return;
+        }
+        
+        const recentTrainings = trainings
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .slice(0, 5);
+            
+        const html = recentTrainings.map((training, index) => `
+            <div class="activity-item d-flex justify-content-between align-items-center p-3 rounded mb-2 ${index === 0 ? 'bg-primary bg-opacity-10' : 'bg-light'}" style="transition: all 0.2s ease;">
+                <div class="d-flex align-items-center">
+                    <div class="activity-icon me-3">
+                        <i class="bi ${getTrainingIcon(training.status)} ${getTrainingIconColor(training.status)}"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold">${training.dataset_name || 'Dataset #' + training.dataset_id}</div>
+                        <div class="small text-muted">
+                            <i class="bi bi-clock me-1"></i>
+                            ${formatDateTime(training.created_at)}
+                        </div>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <span class="badge ${getStatusBadgeClass(training.status)} rounded-pill">
+                        ${getStatusText(training.status)}
+                    </span>
+                    ${index === 0 ? '<div class="small text-primary mt-1">Mais recente</div>' : ''}
+                </div>
+            </div>
+        `).join('');
+        
+        container.innerHTML = html;
+    }
+    
+    function getTrainingIcon(status) {
+        switch(status) {
+            case 'running': return 'bi-play-circle-fill';
+            case 'completed': return 'bi-check-circle-fill';
+            case 'failed': return 'bi-x-circle-fill';
+            case 'pending': return 'bi-clock-fill';
+            default: return 'bi-circle-fill';
+        }
+    }
+    
+    function getTrainingIconColor(status) {
+        switch(status) {
+            case 'running': return 'text-primary';
+            case 'completed': return 'text-success';
+            case 'failed': return 'text-danger';
+            case 'pending': return 'text-warning';
+            default: return 'text-secondary';
+        }
+    }
+    
+    function getStatusText(status) {
+        switch(status) {
+            case 'running': return 'Executando';
+            case 'completed': return 'Concluído';
+            case 'failed': return 'Falhou';
+            case 'pending': return 'Pendente';
+            default: return status;
+        }
+    }
+    
+    function setupWebSocket() {
+        try {
+            const socket = io('/ws/trainings');
+            
+            socket.on('connect', function() {
+                updateWebSocketStatus('connected');
+            });
+            
+            socket.on('disconnect', function() {
+                updateWebSocketStatus('disconnected');
+            });
+            
+            socket.on('training_status', function(data) {
+                // Refresh data when training status changes
+                loadDashboardData();
+            });
+            
+        } catch (error) {
+            console.error('WebSocket connection failed:', error);
+            updateWebSocketStatus('error');
+        }
+    }
+    
+    function updateWebSocketStatus(status) {
+        const statusEl = document.getElementById('websocket-status');
+        if (!statusEl) return;
+        
+        switch(status) {
+            case 'connected':
+                statusEl.innerHTML = '<i class="bi bi-check-circle"></i> Conectado';
+                statusEl.className = 'text-success fw-medium';
+                break;
+            case 'disconnected':
+                statusEl.innerHTML = '<i class="bi bi-x-circle"></i> Desconectado';
+                statusEl.className = 'text-warning fw-medium';
+                break;
+            case 'error':
+                statusEl.innerHTML = '<i class="bi bi-exclamation-circle"></i> Erro';
+                statusEl.className = 'text-danger fw-medium';
+                break;
+        }
+    }
+</script>
+{% endblock %}

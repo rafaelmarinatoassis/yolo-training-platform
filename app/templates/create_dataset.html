@@ -1,0 +1,1507 @@
+{% extends "base.html" %}
+
+{% block title %}Criar Novo Dataset - YOLO Trainer{% endblock %}
+
+{% block extra_css %}
+<style>
+.step-content {
+    min-height: 400px;
+    padding: 20px 0;
+}
+.step-content h4 {
+    color: #333;
+    font-weight: 600;
+}
+.card-body {
+    min-height: 500px;
+}
+#step-content-1 {
+    display: block !important;
+}
+.upload-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+}
+.upload-area:hover {
+    border-color: #0d6efd;
+    background-color: #e7f1ff;
+}
+.upload-area.dragover {
+    border-color: #0d6efd;
+    background-color: #e7f1ff;
+}
+.info-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+.help-icon {
+    cursor: help;
+    color: #6c757d;
+}
+.help-icon:hover {
+    color: #0d6efd;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="mb-2">
+                        <i class="bi bi-plus-circle text-primary"></i>
+                        Criar Novo Dataset
+                    </h1>
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        Organize suas imagens e anotações para treinar um modelo de detecção de objetos
+                    </p>
+                </div>
+                <a href="{{ url_for('ui.datasets_page') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                    Voltar aos Datasets
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Info Card para usuários leigos -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card info-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-lightbulb"></i>
+                        O que é um Dataset?
+                    </h5>
+                    <p class="card-text mb-3">
+                        Um dataset é uma coleção organizada de imagens e suas respectivas anotações que ensinam ao computador 
+                        o que você quer detectar. Pense como um "livro de exemplos" para a inteligência artificial.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6><i class="bi bi-camera"></i> Imagens</h6>
+                            <small>Fotos dos objetos que você quer detectar</small>
+                        </div>
+                        <div class="col-md-4">
+                            <h6><i class="bi bi-square"></i> Anotações</h6>
+                            <small>Marcações que mostram onde estão os objetos</small>
+                        </div>
+                        <div class="col-md-4">
+                            <h6><i class="bi bi-robot"></i> Resultado</h6>
+                            <small>IA treinada para detectar seus objetos</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Progress Steps -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list-check"></i>
+                        Progresso da Criação
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="step active" id="step-1">
+                            <div class="step-number">1</div>
+                            <div class="step-title">Informações Básicas</div>
+                            <small class="text-muted">Nome e classes</small>
+                        </div>
+                        <div class="step" id="step-2">
+                            <div class="step-number">2</div>
+                            <div class="step-title">Upload de Arquivos</div>
+                            <small class="text-muted">Imagens e anotações</small>
+                        </div>
+                        <div class="step" id="step-3">
+                            <div class="step-number">3</div>
+                            <div class="step-title">Revisão</div>
+                            <small class="text-muted">Validação e configuração</small>
+                        </div>
+                        <div class="step" id="step-4">
+                            <div class="step-number">4</div>
+                            <div class="step-title">Finalizar</div>
+                            <small class="text-muted">Criar dataset</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Form Container -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form id="datasetForm" enctype="multipart/form-data">
+                        <!-- Step 1: Basic Information -->
+                        <div class="step-content" id="step-content-1" style="display: block !important;">
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h4 class="text-primary">
+                                        <i class="bi bi-1-circle-fill"></i>
+                                        Informações Básicas do Dataset
+                                    </h4>
+                                    <p class="text-muted">Vamos começar definindo um nome e as categorias de objetos que você quer detectar.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="mb-4">
+                                                <label for="datasetName" class="form-label h6">
+                                                    <i class="bi bi-tag"></i>
+                                                    Nome do Dataset
+                                                    <span class="text-danger">*</span>
+                                                    <i class="bi bi-question-circle help-icon ms-1" 
+                                                       data-bs-toggle="tooltip" 
+                                                       title="Escolha um nome único e descritivo. Ex: 'detecção-carros', 'produtos-fabrica', etc."></i>
+                                                </label>
+                                                <input type="text" class="form-control form-control-lg" id="datasetName" name="name" 
+                                                       placeholder="Ex: detecção-produtos-fabrica" required>
+                                                <div class="form-text">
+                                                    <i class="bi bi-info-circle text-primary"></i>
+                                                    Use apenas letras, números e hífens. Este nome identificará seu dataset no sistema.
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-4">
+                                                <label class="form-label h6">
+                                                    <i class="bi bi-collection"></i>
+                                                    Categorias de Objetos (Classes)
+                                                    <span class="text-danger">*</span>
+                                                    <i class="bi bi-question-circle help-icon ms-1" 
+                                                       data-bs-toggle="tooltip" 
+                                                       title="Defina todos os tipos de objetos que você quer que a IA detecte. Ex: pessoa, carro, cachorro, etc."></i>
+                                                </label>
+                                                <div id="classes-container">
+                                                    <div class="class-input-group mb-3">
+                                                        <div class="input-group input-group-lg">
+                                                            <span class="input-group-text bg-primary text-white fw-bold">0</span>
+                                                            <input type="text" class="form-control class-name" 
+                                                                   placeholder="Ex: pessoa, carro, produto..." required>
+                                                            <button type="button" class="btn btn-outline-danger remove-class" disabled>
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button type="button" class="btn btn-outline-primary btn-lg" id="addClassBtn">
+                                                    <i class="bi bi-plus-circle"></i>
+                                                    Adicionar Nova Categoria
+                                                </button>
+                                                <div class="form-text mt-2">
+                                                    <i class="bi bi-lightbulb text-warning"></i>
+                                                    <strong>Dica:</strong> Seja específico! Em vez de "objeto", use "carro", "pessoa", "produto", etc.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-4">
+                                    <div class="card bg-light">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">
+                                                <i class="bi bi-question-circle-fill text-info"></i>
+                                                Precisa de Ajuda?
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <h6 class="text-primary">Exemplos de Nomes:</h6>
+                                            <ul class="list-unstyled">
+                                                <li><i class="bi bi-check text-success"></i> detecção-veiculos</li>
+                                                <li><i class="bi bi-check text-success"></i> produtos-linha-producao</li>
+                                                <li><i class="bi bi-check text-success"></i> animais-domesticos</li>
+                                            </ul>
+                                            
+                                            <hr>
+                                            
+                                            <h6 class="text-primary">Exemplos de Classes:</h6>
+                                            <ul class="list-unstyled">
+                                                <li><i class="bi bi-dot"></i> Para veículos: carro, moto, caminhão</li>
+                                                <li><i class="bi bi-dot"></i> Para animais: cachorro, gato, pássaro</li>
+                                                <li><i class="bi bi-dot"></i> Para produtos: garrafa, caixa, lata</li>
+                                            </ul>
+                                            
+                                            <div class="alert alert-info mt-3">
+                                                <small>
+                                                    <i class="bi bi-info-circle"></i>
+                                                    Cada categoria terá um número automático (0, 1, 2...) que será usado nas anotações.
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2: File Upload -->
+                        <div class="step-content" id="step-content-2" style="display: none;">
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h4 class="text-primary">
+                                        <i class="bi bi-2-circle-fill"></i>
+                                        Upload de Imagens e Anotações
+                                    </h4>
+                                    <p class="text-muted">
+                                        Agora vamos enviar suas imagens e anotações. Organizamos em 3 grupos para treinar a IA adequadamente.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Explicação dos splits -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        <h6 class="alert-heading">
+                                            <i class="bi bi-info-circle"></i>
+                                            Por que dividir em grupos?
+                                        </h6>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <strong>Treinamento (Train):</strong> A IA aprende com esses exemplos
+                                            </div>
+                                            <div class="col-md-4">
+                                                <strong>Validação (Validation):</strong> Testa o aprendizado durante o treino
+                                            </div>
+                                            <div class="col-md-4">
+                                                <strong>Teste (Test):</strong> Avaliação final (opcional)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <!-- Train Split -->
+                                <div class="col-lg-4 mb-4">
+                                    <div class="card h-100 border-success">
+                                        <div class="card-header bg-success text-white">
+                                            <h6 class="mb-0">
+                                                <i class="bi bi-mortarboard"></i>
+                                                Treinamento
+                                                <span class="badge bg-light text-success ms-2">Obrigatório</span>
+                                            </h6>
+                                            <small>70-80% das suas imagens</small>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">
+                                                    <i class="bi bi-images"></i>
+                                                    Imagens de Treinamento
+                                                    <i class="bi bi-question-circle help-icon ms-1" 
+                                                       data-bs-toggle="tooltip" 
+                                                       title="Suas melhores imagens com boa qualidade e variação"></i>
+                                                </label>
+                                                <div class="upload-area" id="train-images-upload">
+                                                    <i class="bi bi-cloud-upload display-4 text-muted"></i>
+                                                    <p class="mt-2 mb-1">Clique ou arraste suas imagens</p>
+                                                    <small class="text-muted d-block">JPG, PNG, JPEG, BMP</small>
+                                                    <small class="text-muted">Múltiplas imagens suportadas</small>
+                                                    <input type="file" class="d-none" name="train_images" accept=".jpg,.jpeg,.png,.bmp,.tiff" multiple id="train-images-input">
+                                                </div>
+                                                <div class="upload-status" id="train-images-status"></div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">
+                                                    <i class="bi bi-file-text"></i>
+                                                    Anotações de Treinamento
+                                                    <i class="bi bi-question-circle help-icon ms-1" 
+                                                       data-bs-toggle="tooltip" 
+                                                       title="Arquivos .txt que mostram onde estão os objetos nas imagens"></i>
+                                                </label>
+                                                <div class="upload-area" id="train-labels-upload">
+                                                    <i class="bi bi-cloud-upload display-4 text-muted"></i>
+                                                    <p class="mt-2 mb-1">Clique ou arraste os arquivos .txt</p>
+                                                    <small class="text-muted d-block">Um arquivo .txt para cada imagem</small>
+                                                    <small class="text-muted">Nome deve corresponder à imagem</small>
+                                                    <input type="file" class="d-none" name="train_labels" accept=".txt" multiple id="train-labels-input">
+                                                </div>
+                                                <div class="upload-status" id="train-labels-status"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Val Split -->
+                                <div class="col-lg-4 mb-4">
+                                    <div class="card h-100 border-warning">
+                                        <div class="card-header bg-warning text-dark">
+                                            <h6 class="mb-0">
+                                                <i class="bi bi-speedometer"></i>
+                                                Validação
+                                                <span class="badge bg-dark ms-2">Obrigatório</span>
+                                            </h6>
+                                            <small>15-20% das suas imagens</small>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">
+                                                    <i class="bi bi-images"></i>
+                                                    Imagens de Validação
+                                                </label>
+                                                <div class="upload-area" id="val-images-upload">
+                                                    <i class="bi bi-cloud-upload display-4 text-muted"></i>
+                                                    <p class="mt-2 mb-1">Clique ou arraste suas imagens</p>
+                                                    <small class="text-muted d-block">JPG, PNG, JPEG, BMP</small>
+                                                    <small class="text-muted">Múltiplas imagens suportadas</small>
+                                                    <input type="file" class="d-none" name="val_images" accept=".jpg,.jpeg,.png,.bmp,.tiff" multiple id="val-images-input">
+                                                </div>
+                                                <div class="upload-status" id="val-images-status"></div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">
+                                                    <i class="bi bi-file-text"></i>
+                                                    Anotações de Validação
+                                                </label>
+                                                <div class="upload-area" id="val-labels-upload">
+                                                    <i class="bi bi-cloud-upload display-4 text-muted"></i>
+                                                    <p class="mt-2 mb-1">Clique ou arraste os arquivos .txt</p>
+                                                    <small class="text-muted d-block">Um arquivo .txt para cada imagem</small>
+                                                    <small class="text-muted">Nome deve corresponder à imagem</small>
+                                                    <input type="file" class="d-none" name="val_labels" accept=".txt" multiple id="val-labels-input">
+                                                </div>
+                                                <div class="upload-status" id="val-labels-status"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Test Split -->
+                                <div class="col-lg-4 mb-4">
+                                    <div class="card h-100 border-info">
+                                        <div class="card-header bg-info text-white">
+                                            <h6 class="mb-0">
+                                                <i class="bi bi-clipboard-check"></i>
+                                                Teste
+                                                <span class="badge bg-light text-info ms-2">Opcional</span>
+                                            </h6>
+                                            <small>5-10% das suas imagens</small>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">
+                                                    <i class="bi bi-images"></i>
+                                                    Imagens de Teste
+                                                </label>
+                                                <div class="upload-area" id="test-images-upload">
+                                                    <i class="bi bi-cloud-upload display-4 text-muted"></i>
+                                                    <p class="mt-2 mb-1">Clique ou arraste suas imagens</p>
+                                                    <small class="text-muted d-block">JPG, PNG, JPEG, BMP</small>
+                                                    <small class="text-muted">Múltiplas imagens suportadas</small>
+                                                    <input type="file" class="d-none" name="test_images" accept=".jpg,.jpeg,.png,.bmp,.tiff" multiple id="test-images-input">
+                                                </div>
+                                                <div class="upload-status" id="test-images-status"></div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">
+                                                    <i class="bi bi-file-text"></i>
+                                                    Anotações de Teste
+                                                </label>
+                                                <div class="upload-area" id="test-labels-upload">
+                                                    <i class="bi bi-cloud-upload display-4 text-muted"></i>
+                                                    <p class="mt-2 mb-1">Clique ou arraste os arquivos .txt</p>
+                                                    <small class="text-muted d-block">Um arquivo .txt para cada imagem</small>
+                                                    <small class="text-muted">Nome deve corresponder à imagem</small>
+                                                    <input type="file" class="d-none" name="test_labels" accept=".txt" multiple id="test-labels-input">
+                                                </div>
+                                                <div class="upload-status" id="test-labels-status"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card border-primary">
+                                        <div class="card-header bg-primary text-white">
+                                            <h6 class="mb-0">
+                                                <i class="bi bi-info-circle"></i>
+                                                Informações Importantes sobre os Arquivos
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h6 class="text-success">
+                                                        <i class="bi bi-check-circle"></i>
+                                                        Formato das Imagens
+                                                    </h6>
+                                                    <ul class="list-unstyled">
+                                                        <li><i class="bi bi-dot"></i> Formatos aceitos: JPG, JPEG, PNG, BMP</li>
+                                                        <li><i class="bi bi-dot"></i> Qualidade boa (não muito pixelizada)</li>
+                                                        <li><i class="bi bi-dot"></i> Tamanho recomendado: pelo menos 640x640 pixels</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h6 class="text-info">
+                                                        <i class="bi bi-file-text"></i>
+                                                        Formato das Anotações
+                                                    </h6>
+                                                    <ul class="list-unstyled">
+                                                        <li><i class="bi bi-dot"></i> Arquivos .txt no formato YOLO</li>
+                                                        <li><i class="bi bi-dot"></i> Uma linha por objeto detectado</li>
+                                                        <li><i class="bi bi-dot"></i> Nome igual ao da imagem (ex: foto1.jpg → foto1.txt)</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="alert alert-warning mt-3 mb-0">
+                                                <i class="bi bi-exclamation-triangle"></i>
+                                                <strong>Lembre-se:</strong> Treinamento e Validação são obrigatórios. 
+                                                O conjunto de Teste é opcional, mas recomendado para avaliar melhor seu modelo.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3: Validation and YAML -->
+                        <div class="step-content" id="step-content-3" style="display: none;">
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h4 class="text-primary">
+                                        <i class="bi bi-3-circle-fill"></i>
+                                        Revisão e Validação
+                                    </h4>
+                                    <p class="text-muted">
+                                        Vamos verificar se tudo está correto antes de criar seu dataset.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="card border-success">
+                                        <div class="card-header bg-success text-white">
+                                            <h6 class="mb-0">
+                                                <i class="bi bi-check-circle"></i>
+                                                Resumo da Validação
+                                            </h6>
+                                        </div>
+                                        <div class="card-body" id="validation-summary">
+                                            <!-- Content will be populated dynamically -->
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card mt-4">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">
+                                                <i class="bi bi-question-circle-fill text-info"></i>
+                                                O que acontece agora?
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <ol class="list-group list-group-numbered list-group-flush">
+                                                <li class="list-group-item d-flex align-items-start">
+                                                    <div>
+                                                        <strong>Organização:</strong> Seus arquivos serão organizados nas pastas corretas
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item d-flex align-items-start">
+                                                    <div>
+                                                        <strong>Validação:</strong> Verificaremos se imagens e anotações estão compatíveis
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item d-flex align-items-start">
+                                                    <div>
+                                                        <strong>Configuração:</strong> Criaremos o arquivo de configuração automaticamente
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item d-flex align-items-start">
+                                                    <div>
+                                                        <strong>Pronto!</strong> Seu dataset estará disponível para treinamento
+                                                    </div>
+                                                </li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">
+                                                <i class="bi bi-file-code"></i>
+                                                Configuração do Dataset
+                                                <i class="bi bi-question-circle help-icon ms-1" 
+                                                   data-bs-toggle="tooltip" 
+                                                   title="Este arquivo YAML informa ao sistema onde encontrar suas imagens e classes"></i>
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="text-muted small mb-3">
+                                                Arquivo de configuração que será criado automaticamente:
+                                            </p>
+                                            <pre id="yaml-preview" class="border p-3 rounded bg-light" style="font-size: 0.875rem; max-height: 300px; overflow-y: auto;"></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 4: Finish -->
+                        <div class="step-content" id="step-content-4" style="display: none;">
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h4 class="text-primary">
+                                        <i class="bi bi-4-circle-fill"></i>
+                                        Finalizar Criação
+                                    </h4>
+                                    <p class="text-muted">
+                                        Última etapa! Vamos criar seu dataset e deixá-lo pronto para uso.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Initial Step 4 Content -->
+                            <div id="step4-initial">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-8">
+                                        <div class="card border-success shadow">
+                                            <div class="card-header bg-success text-white">
+                                                <h5 class="mb-0">
+                                                    <i class="bi bi-check-circle"></i>
+                                                    Tudo Pronto para Criar seu Dataset!
+                                                </h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div id="final-summary">
+                                                    <!-- Content will be populated dynamically -->
+                                                </div>
+                                                
+                                <div class="alert alert-success mt-4">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <h6 class="alert-heading mb-2">
+                                                <i class="bi bi-rocket"></i>
+                                                Pronto para Decolar!
+                                            </h6>
+                                            <p class="mb-0">
+                                                Todos os arquivos foram validados e organizados. 
+                                                Seu dataset será criado e estará disponível para treinamento em instantes.
+                                            </p>
+                                        </div>
+                                        <div class="col-md-4 text-center">
+                                            <button type="button" class="btn btn-success btn-lg shadow" onclick="createDataset()">
+                                                <i class="bi bi-plus-circle"></i>
+                                                Criar Dataset
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Botão adicional para maior visibilidade -->
+                                <div class="text-center mt-4">
+                                    <button type="button" class="btn btn-success btn-lg px-5 py-3" onclick="createDataset()" style="font-size: 1.2rem;">
+                                        <i class="bi bi-plus-circle-fill me-2"></i>
+                                        Criar Meu Dataset Agora
+                                    </button>
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            <i class="bi bi-info-circle"></i>
+                                            Clique para iniciar a criação do seu dataset
+                                        </small>
+                                    </div>
+                                </div>                                                <div class="row mt-4">
+                                                    <div class="col-md-6">
+                                                        <div class="card bg-light">
+                                                            <div class="card-body text-center">
+                                                                <i class="bi bi-clock text-primary" style="font-size: 2rem;"></i>
+                                                                <h6 class="mt-2">Tempo de Criação</h6>
+                                                                <p class="text-muted small mb-0">Geralmente leva alguns segundos</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="card bg-light">
+                                                            <div class="card-body text-center">
+                                                                <i class="bi bi-arrow-right-circle text-success" style="font-size: 2rem;"></i>
+                                                                <h6 class="mt-2">Próximo Passo</h6>
+                                                                <p class="text-muted small mb-0">Treinar seu modelo de IA</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Creation Progress -->
+                            <div id="creation-progress" style="display: none;">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-6">
+                                        <div class="card">
+                                            <div class="card-body text-center py-5">
+                                                <div class="spinner-border text-primary mb-4" style="width: 4rem; height: 4rem;"></div>
+                                                <h4 class="text-primary">Criando seu dataset...</h4>
+                                                <p class="text-muted mb-4">
+                                                    Estamos organizando seus arquivos e criando a estrutura necessária.
+                                                    <br>Por favor, aguarde alguns instantes.
+                                                </p>
+                                                <div class="progress" style="height: 8px;">
+                                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                                                         role="progressbar" style="width: 100%"></div>
+                                                </div>
+                                                <small class="text-muted mt-3 d-block">
+                                                    <i class="bi bi-info-circle"></i>
+                                                    Não feche esta página durante o processo
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Success Message -->
+                            <div id="creation-success" style="display: none;">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-6">
+                                        <div class="card border-success">
+                                            <div class="card-body text-center py-5">
+                                                <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                                                <h3 class="text-success mt-4 mb-3">Dataset Criado com Sucesso!</h3>
+                                                <p class="text-muted mb-4">
+                                                    Parabéns! Seu dataset foi criado e está pronto para treinar modelos de IA.
+                                                    Agora você pode iniciar o treinamento ou visualizar seus datasets.
+                                                </p>
+                                                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                                    <a href="{{ url_for('ui.train_page') }}" class="btn btn-success btn-lg me-md-2">
+                                                        <i class="bi bi-play-circle"></i>
+                                                        Iniciar Treinamento
+                                                    </a>
+                                                    <a href="{{ url_for('ui.datasets_page') }}" class="btn btn-outline-primary btn-lg">
+                                                        <i class="bi bi-collection"></i>
+                                                        Ver Meus Datasets
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Error Message -->
+                            <div id="creation-error" style="display: none;">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-6">
+                                        <div class="card border-danger">
+                                            <div class="card-body text-center py-5">
+                                                <i class="bi bi-x-circle-fill text-danger" style="font-size: 5rem;"></i>
+                                                <h3 class="text-danger mt-4 mb-3">Ops! Algo deu errado</h3>
+                                                <p class="text-muted mb-2">Não foi possível criar o dataset:</p>
+                                                <div class="alert alert-danger">
+                                                    <p class="mb-0" id="error-message"></p>
+                                                </div>
+                                                <div class="mt-4">
+                                                    <button type="button" class="btn btn-primary btn-lg" onclick="goToStep(1)">
+                                                        <i class="bi bi-arrow-clockwise"></i>
+                                                        Tentar Novamente
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Navigation Buttons -->
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button type="button" class="btn btn-outline-secondary btn-lg" id="prevBtn" onclick="previousStep()" style="display: none;">
+                            <i class="bi bi-arrow-left"></i>
+                            Etapa Anterior
+                        </button>
+                        <div></div>
+                        <button type="button" class="btn btn-primary btn-lg" id="nextBtn" onclick="nextStep()">
+                            Próxima Etapa
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        flex: 1;
+        padding: 0 10px;
+    }
+    
+    .step:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 60%;
+        right: -40%;
+        height: 3px;
+        background: linear-gradient(90deg, #dee2e6 0%, #dee2e6 100%);
+        z-index: -1;
+    }
+    
+    .step.active:not(:last-child)::after,
+    .step.completed:not(:last-child)::after {
+        background: linear-gradient(90deg, #0d6efd 0%, #0d6efd 100%);
+    }
+    
+    .step-number {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background-color: #dee2e6;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+        border: 3px solid #dee2e6;
+    }
+    
+    .step.active .step-number {
+        background-color: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+        transform: scale(1.1);
+    }
+    
+    .step.completed .step-number {
+        background-color: #28a745;
+        color: white;
+        border-color: #28a745;
+    }
+    
+    .step.completed .step-number::before {
+        content: '✓';
+        font-weight: bold;
+    }
+    
+    .step-title {
+        font-size: 0.9rem;
+        text-align: center;
+        color: #6c757d;
+        font-weight: 500;
+        margin-bottom: 2px;
+    }
+    
+    .step.active .step-title {
+        color: #0d6efd;
+        font-weight: 600;
+    }
+    
+    .step.completed .step-title {
+        color: #28a745;
+        font-weight: 600;
+    }
+    
+    .class-input-group {
+        max-width: 100%;
+    }
+    
+    .upload-status {
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .upload-status .text-success {
+        background-color: #d1edff;
+        border: 1px solid #b6d7ff;
+        border-radius: 4px;
+        padding: 8px 12px;
+    }
+    
+    /* Tooltips personalizados */
+    .tooltip-inner {
+        max-width: 250px;
+        text-align: left;
+    }
+    
+    /* Animações suaves */
+    .step-content {
+        opacity: 0;
+        transform: translateX(20px);
+        transition: all 0.3s ease;
+    }
+    
+    .step-content[style*="display: block"] {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    /* Melhorias nos cards */
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    /* Melhorias nos botões */
+    .btn-lg {
+        padding: 12px 24px;
+        font-size: 1.1rem;
+    }
+    
+    /* Responsividade melhorada */
+    @media (max-width: 768px) {
+        .step {
+            padding: 0 5px;
+        }
+        
+        .step-title {
+            font-size: 0.8rem;
+        }
+        
+        .step-number {
+            width: 35px;
+            height: 35px;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let currentStep = 1;
+    let uploadedFiles = {};
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize currentStep first
+        currentStep = 1;
+        
+        // Hide all steps first
+        document.querySelectorAll('.step-content').forEach(step => {
+            step.style.display = 'none';
+        });
+        
+        // Show first step
+        document.getElementById('step-content-1').style.display = 'block';
+        document.getElementById('step-1').classList.add('active');
+        
+        // Initialize functions
+        setupUploadAreas();
+        setupClassManagement();
+        updateNavigation();
+        
+        // Initialize Bootstrap tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Add showAlert function if not exists
+        if (typeof showAlert === 'undefined') {
+            window.showAlert = function(message, type) {
+                const alertContainer = document.createElement('div');
+                alertContainer.innerHTML = `
+                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                document.querySelector('.container-fluid').insertBefore(alertContainer, document.querySelector('.container-fluid').firstChild);
+                
+                setTimeout(() => {
+                    alertContainer.remove();
+                }, 5000);
+            };
+        }
+    });
+    
+    function setupUploadAreas() {
+        const uploads = [
+            'train-images', 'train-labels',
+            'val-images', 'val-labels',
+            'test-images', 'test-labels'
+        ];
+        
+        uploads.forEach(uploadId => {
+            const uploadArea = document.getElementById(`${uploadId}-upload`);
+            const input = document.getElementById(`${uploadId}-input`);
+            const status = document.getElementById(`${uploadId}-status`);
+            
+            uploadArea.addEventListener('click', () => input.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('drop', (e) => handleDrop(e, input));
+            
+            input.addEventListener('change', (e) => handleFileSelect(e, uploadId, status));
+        });
+    }
+    
+    function setupClassManagement() {
+        document.getElementById('addClassBtn').addEventListener('click', addClassInput);
+        
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-class')) {
+                removeClassInput(e.target.closest('.remove-class'));
+            }
+        });
+    }
+    
+    function addClassInput() {
+        const container = document.getElementById('classes-container');
+        const classCount = container.children.length;
+        
+        const div = document.createElement('div');
+        div.className = 'class-input-group mb-3';
+        div.innerHTML = `
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-primary text-white fw-bold">${classCount}</span>
+                <input type="text" class="form-control class-name" placeholder="Ex: pessoa, carro, produto..." required>
+                <button type="button" class="btn btn-outline-danger remove-class">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        `;
+        
+        container.appendChild(div);
+        updateRemoveButtons();
+        
+        // Focus no novo input
+        div.querySelector('.class-name').focus();
+    }
+    
+    function removeClassInput(button) {
+        const container = document.getElementById('classes-container');
+        if (container.children.length > 1) {
+            button.closest('.class-input-group').remove();
+            updateClassIndices();
+            updateRemoveButtons();
+        }
+    }
+    
+    function updateClassIndices() {
+        const inputs = document.querySelectorAll('.class-input-group');
+        inputs.forEach((input, index) => {
+            const span = input.querySelector('.input-group-text');
+            span.textContent = index;
+            span.className = 'input-group-text bg-primary text-white fw-bold';
+        });
+    }
+    
+    function updateRemoveButtons() {
+        const buttons = document.querySelectorAll('.remove-class');
+        buttons.forEach((button, index) => {
+            button.disabled = buttons.length === 1;
+        });
+    }
+    
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.currentTarget.classList.add('dragover');
+    }
+    
+    function handleDrop(e, input) {
+        e.preventDefault();
+        e.currentTarget.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            input.files = files;
+            input.dispatchEvent(new Event('change'));
+        }
+    }
+    
+    function handleFileSelect(e, uploadId, statusElement) {
+        const files = e.target.files;
+        if (files.length > 0) {
+            uploadedFiles[uploadId] = files;
+            
+            if (files.length === 1) {
+                statusElement.innerHTML = `
+                    <div class="text-success">
+                        <i class="bi bi-check-circle"></i>
+                        ${files[0].name} (${formatFileSize(files[0].size)})
+                    </div>
+                `;
+            } else {
+                const totalSize = Array.from(files).reduce((total, file) => total + file.size, 0);
+                statusElement.innerHTML = `
+                    <div class="text-success">
+                        <i class="bi bi-check-circle"></i>
+                        ${files.length} arquivos selecionados (${formatFileSize(totalSize)})
+                    </div>
+                `;
+            }
+        }
+    }
+    
+    function nextStep() {
+        if (validateCurrentStep()) {
+            if (currentStep < 4) {
+                goToStep(currentStep + 1);
+            } else {
+                createDataset();
+            }
+        }
+    }
+    
+    function previousStep() {
+        if (currentStep > 1) {
+            goToStep(currentStep - 1);
+        }
+    }
+    
+    function goToStep(step) {
+        // Hide current step (only if one is currently active)
+        if (currentStep) {
+            const currentStepElement = document.getElementById(`step-content-${currentStep}`);
+            if (currentStepElement) {
+                currentStepElement.style.display = 'none';
+            }
+            const currentStepIndicator = document.getElementById(`step-${currentStep}`);
+            if (currentStepIndicator) {
+                currentStepIndicator.classList.remove('active');
+            }
+        }
+        
+        // Show new step
+        currentStep = step;
+        document.getElementById(`step-content-${currentStep}`).style.display = 'block';
+        document.getElementById(`step-${currentStep}`).classList.add('active');
+        
+        // Mark previous steps as completed
+        for (let i = 1; i < currentStep; i++) {
+            document.getElementById(`step-${i}`).classList.add('completed');
+        }
+        
+        // Special handling for step 3
+        if (currentStep === 3) {
+            generateValidationSummary();
+            generateYamlPreview();
+        }
+        
+        // Special handling for step 4
+        if (currentStep === 4) {
+            generateFinalSummary();
+        }
+        
+        updateNavigation();
+    }
+    
+    function updateNavigation() {
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        prevBtn.style.display = currentStep > 1 ? 'block' : 'none';
+        
+        if (currentStep === 4) {
+            nextBtn.style.display = 'none';
+        } else {
+            nextBtn.style.display = 'block';
+            if (currentStep === 3) {
+                nextBtn.innerHTML = '<i class="bi bi-check-circle"></i> Finalizar';
+                nextBtn.className = 'btn btn-success btn-lg';
+            } else {
+                nextBtn.innerHTML = 'Próxima Etapa <i class="bi bi-arrow-right"></i>';
+                nextBtn.className = 'btn btn-primary btn-lg';
+            }
+        }
+    }
+    
+    function validateCurrentStep() {
+        switch (currentStep) {
+            case 1:
+                return validateBasicInfo();
+            case 2:
+                return validateFileUploads();
+            case 3:
+                return true; // Validation summary step
+            default:
+                return true;
+        }
+    }
+    
+    function validateBasicInfo() {
+        const name = document.getElementById('datasetName').value.trim();
+        const classNames = Array.from(document.querySelectorAll('.class-name'))
+            .map(input => input.value.trim())
+            .filter(name => name.length > 0);
+        
+        if (!name) {
+            showAlert('⚠️ Por favor, insira um nome para o dataset', 'warning');
+            document.getElementById('datasetName').focus();
+            return false;
+        }
+        
+        if (!/^[a-zA-Z0-9\-_]+$/.test(name)) {
+            showAlert('⚠️ O nome deve conter apenas letras, números, hífens e underscores', 'warning');
+            document.getElementById('datasetName').focus();
+            return false;
+        }
+        
+        if (classNames.length === 0) {
+            showAlert('⚠️ Defina pelo menos uma categoria (classe) para o dataset', 'warning');
+            document.querySelector('.class-name').focus();
+            return false;
+        }
+        
+        // Verificar duplicatas
+        const duplicates = classNames.filter((name, index) => classNames.indexOf(name) !== index);
+        if (duplicates.length > 0) {
+            showAlert('⚠️ Existem categorias duplicadas. Cada categoria deve ter um nome único.', 'warning');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    function validateFileUploads() {
+        const requiredUploads = ['train-images', 'train-labels', 'val-images', 'val-labels'];
+        const missing = requiredUploads.filter(id => !uploadedFiles[id]);
+        
+        if (missing.length > 0) {
+            const missingNames = missing.map(id => {
+                const parts = id.split('-');
+                const type = parts[0] === 'train' ? 'Treinamento' : 'Validação';
+                const fileType = parts[1] === 'images' ? 'imagens' : 'anotações';
+                return `${type} (${fileType})`;
+            });
+            
+            showAlert(`⚠️ Arquivos obrigatórios não enviados: ${missingNames.join(', ')}`, 'warning');
+            return false;
+        }
+        
+        // Verificar se número de imagens e labels correspondem
+        const trainImagesCount = uploadedFiles['train-images'] ? uploadedFiles['train-images'].length : 0;
+        const trainLabelsCount = uploadedFiles['train-labels'] ? uploadedFiles['train-labels'].length : 0;
+        const valImagesCount = uploadedFiles['val-images'] ? uploadedFiles['val-images'].length : 0;
+        const valLabelsCount = uploadedFiles['val-labels'] ? uploadedFiles['val-labels'].length : 0;
+        
+        if (trainImagesCount !== trainLabelsCount) {
+            showAlert(`⚠️ Treinamento: ${trainImagesCount} imagens mas ${trainLabelsCount} anotações. Os números devem ser iguais.`, 'warning');
+            return false;
+        }
+        
+        if (valImagesCount !== valLabelsCount) {
+            showAlert(`⚠️ Validação: ${valImagesCount} imagens mas ${valLabelsCount} anotações. Os números devem ser iguais.`, 'warning');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    function generateValidationSummary() {
+        const name = document.getElementById('datasetName').value.trim();
+        const classNames = Array.from(document.querySelectorAll('.class-name'))
+            .map(input => input.value.trim())
+            .filter(name => name.length > 0);
+        
+        // Contar arquivos
+        const trainImagesCount = uploadedFiles['train-images'] ? uploadedFiles['train-images'].length : 0;
+        const trainLabelsCount = uploadedFiles['train-labels'] ? uploadedFiles['train-labels'].length : 0;
+        const valImagesCount = uploadedFiles['val-images'] ? uploadedFiles['val-images'].length : 0;
+        const valLabelsCount = uploadedFiles['val-labels'] ? uploadedFiles['val-labels'].length : 0;
+        const testImagesCount = uploadedFiles['test-images'] ? uploadedFiles['test-images'].length : 0;
+        const testLabelsCount = uploadedFiles['test-labels'] ? uploadedFiles['test-labels'].length : 0;
+        
+        const hasTestFiles = testImagesCount > 0 && testLabelsCount > 0;
+        
+        const summary = document.getElementById('validation-summary');
+        summary.innerHTML = `
+            <div class="row mb-3">
+                <div class="col-sm-4"><strong><i class="bi bi-tag"></i> Nome:</strong></div>
+                <div class="col-sm-8"><span class="badge bg-primary fs-6">${name}</span></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4"><strong><i class="bi bi-collection"></i> Classes:</strong></div>
+                <div class="col-sm-8">
+                    <span class="badge bg-info me-1">${classNames.length} categorias</span>
+                    <br><small class="text-muted mt-1 d-block">${classNames.join(', ')}</small>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-12">
+                    <strong><i class="bi bi-files"></i> Arquivos Enviados:</strong>
+                    <div class="mt-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card border-success mb-2">
+                                    <div class="card-body py-2">
+                                        <h6 class="card-title text-success mb-1">
+                                            <i class="bi bi-mortarboard"></i> Treinamento
+                                        </h6>
+                                        <small>
+                                            ${trainImagesCount} imagens, ${trainLabelsCount} anotações
+                                            ${trainImagesCount === trainLabelsCount ? '<i class="bi bi-check-circle text-success"></i>' : '<i class="bi bi-exclamation-triangle text-warning"></i>'}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-warning mb-2">
+                                    <div class="card-body py-2">
+                                        <h6 class="card-title text-warning mb-1">
+                                            <i class="bi bi-speedometer"></i> Validação
+                                        </h6>
+                                        <small>
+                                            ${valImagesCount} imagens, ${valLabelsCount} anotações
+                                            ${valImagesCount === valLabelsCount ? '<i class="bi bi-check-circle text-success"></i>' : '<i class="bi bi-exclamation-triangle text-warning"></i>'}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            ${hasTestFiles ? `
+                            <div class="col-md-6">
+                                <div class="card border-info mb-2">
+                                    <div class="card-body py-2">
+                                        <h6 class="card-title text-info mb-1">
+                                            <i class="bi bi-clipboard-check"></i> Teste
+                                        </h6>
+                                        <small>
+                                            ${testImagesCount} imagens, ${testLabelsCount} anotações
+                                            ${testImagesCount === testLabelsCount ? '<i class="bi bi-check-circle text-success"></i>' : '<i class="bi bi-exclamation-triangle text-warning"></i>'}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert ${(trainImagesCount === trainLabelsCount && valImagesCount === valLabelsCount && (!hasTestFiles || testImagesCount === testLabelsCount)) ? 'alert-success' : 'alert-warning'} mb-0">
+                <i class="bi bi-${(trainImagesCount === trainLabelsCount && valImagesCount === valLabelsCount && (!hasTestFiles || testImagesCount === testLabelsCount)) ? 'check-circle' : 'exclamation-triangle'}"></i>
+                <strong>Status:</strong> 
+                ${(trainImagesCount === trainLabelsCount && valImagesCount === valLabelsCount && (!hasTestFiles || testImagesCount === testLabelsCount)) ? 
+                    'Tudo certo! Seus arquivos estão prontos.' : 
+                    'Atenção: Verifique se o número de imagens e anotações correspondem.'
+                }
+            </div>
+        `;
+    }
+    
+    function generateYamlPreview() {
+        const name = document.getElementById('datasetName').value.trim();
+        const classNames = Array.from(document.querySelectorAll('.class-name'))
+            .map(input => input.value.trim())
+            .filter(name => name.length > 0);
+        
+        const yaml = `path: data/datasets/${name}
+train: images/train
+val: images/val
+test: images/test
+nc: ${classNames.length}
+names:
+${classNames.map((name, index) => `  ${index}: ${name}`).join('\n')}`;
+        
+        document.getElementById('yaml-preview').textContent = yaml;
+    }
+    
+    function generateFinalSummary() {
+        const name = document.getElementById('datasetName').value.trim();
+        const classNames = Array.from(document.querySelectorAll('.class-name'))
+            .map(input => input.value.trim())
+            .filter(name => name.length > 0);
+        
+        const trainImagesCount = uploadedFiles['train-images'] ? uploadedFiles['train-images'].length : 0;
+        const valImagesCount = uploadedFiles['val-images'] ? uploadedFiles['val-images'].length : 0;
+        const testImagesCount = uploadedFiles['test-images'] ? uploadedFiles['test-images'].length : 0;
+        const totalImages = trainImagesCount + valImagesCount + testImagesCount;
+        
+        const hasTestFiles = uploadedFiles['test-images'] && uploadedFiles['test-labels'];
+        
+        const summary = document.getElementById('final-summary');
+        summary.innerHTML = `
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="card bg-light border-0">
+                        <div class="card-body text-center">
+                            <i class="bi bi-tag text-primary" style="font-size: 2rem;"></i>
+                            <h6 class="mt-2 mb-1">Nome do Dataset</h6>
+                            <p class="fw-bold text-primary mb-0">${name}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-light border-0">
+                        <div class="card-body text-center">
+                            <i class="bi bi-collection text-info" style="font-size: 2rem;"></i>
+                            <h6 class="mt-2 mb-1">Categorias</h6>
+                            <p class="fw-bold text-info mb-0">${classNames.length} classes definidas</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-light border-0">
+                        <div class="card-body text-center">
+                            <i class="bi bi-images text-success" style="font-size: 2rem;"></i>
+                            <h6 class="mt-2 mb-1">Total de Imagens</h6>
+                            <p class="fw-bold text-success mb-0">${totalImages} imagens</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-light border-0">
+                        <div class="card-body text-center">
+                            <i class="bi bi-pie-chart text-warning" style="font-size: 2rem;"></i>
+                            <h6 class="mt-2 mb-1">Divisão dos Dados</h6>
+                            <p class="fw-bold text-warning mb-0">${hasTestFiles ? '3 grupos' : '2 grupos'}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h6 class="text-primary mb-3">
+                        <i class="bi bi-list-check"></i>
+                        Distribuição dos Arquivos:
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <span class="badge bg-success fs-6">${trainImagesCount}</span>
+                                <div class="small text-muted mt-1">Treinamento</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <span class="badge bg-warning fs-6">${valImagesCount}</span>
+                                <div class="small text-muted mt-1">Validação</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <span class="badge bg-info fs-6">${testImagesCount || 0}</span>
+                                <div class="small text-muted mt-1">Teste</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h6 class="text-primary mb-2">
+                        <i class="bi bi-tags"></i>
+                        Suas Categorias:
+                    </h6>
+                    <div>
+                        ${classNames.map((name, index) => `<span class="badge bg-outline-primary me-2 mb-1" style="border: 1px solid #0d6efd; color: #0d6efd;">${index}: ${name}</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    function createDataset() {
+        // Hide initial content and show progress
+        document.getElementById('step4-initial').style.display = 'none';
+        document.getElementById('creation-progress').style.display = 'block';
+        
+        const formData = new FormData();
+        formData.append('name', document.getElementById('datasetName').value.trim());
+        
+        const classNames = Array.from(document.querySelectorAll('.class-name'))
+            .map(input => input.value.trim())
+            .filter(name => name.length > 0);
+        formData.append('classes', JSON.stringify(classNames));
+        
+        console.log('DEBUG: uploadedFiles object:', uploadedFiles);
+        
+        // Add uploaded files (multiple files per field)
+        const fieldMapping = {
+            'train-images': 'train_images',
+            'train-labels': 'train_labels',
+            'val-images': 'val_images',
+            'val-labels': 'val_labels',
+            'test-images': 'test_images',
+            'test-labels': 'test_labels'
+        };
+        
+        Object.keys(uploadedFiles).forEach(key => {
+            const files = uploadedFiles[key];
+            const backendFieldName = fieldMapping[key] || key;
+            console.log(`DEBUG: Processing ${key} -> ${backendFieldName}:`, files);
+            if (files instanceof FileList) {
+                // Multiple files
+                console.log(`DEBUG: ${key} is FileList with ${files.length} files`);
+                Array.from(files).forEach((file, index) => {
+                    console.log(`DEBUG: Adding file ${index} for ${backendFieldName}:`, file.name);
+                    formData.append(backendFieldName, file);
+                });
+            } else {
+                // Single file (backward compatibility)
+                console.log(`DEBUG: ${key} is single file:`, files);
+                formData.append(backendFieldName, files);
+            }
+        });
+        
+        console.log('DEBUG: FormData keys:', Array.from(formData.keys()));
+        
+        fetch('/api/datasets', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('creation-progress').style.display = 'none';
+            
+            if (data.error) {
+                document.getElementById('error-message').textContent = data.error;
+                document.getElementById('creation-error').style.display = 'block';
+            } else {
+                document.getElementById('creation-success').style.display = 'block';
+                showAlert('Dataset criado com sucesso!', 'success');
+            }
+        })
+        .catch(error => {
+            console.error('Error creating dataset:', error);
+            document.getElementById('creation-progress').style.display = 'none';
+            document.getElementById('error-message').textContent = 'Erro de conexão ou servidor';
+            document.getElementById('creation-error').style.display = 'block';
+        });
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+</script>
+{% endblock %}

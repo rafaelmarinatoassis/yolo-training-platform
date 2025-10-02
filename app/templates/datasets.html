@@ -1,0 +1,769 @@
+{% extends "base.html" %}
+
+{% block title %}Datasets - YOLO Trainer{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Hero Header -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="hero-header p-4 rounded-3" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white;">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <div class="mb-3">
+                            <div>
+                                <h1 class="mb-1 fw-bold">Gerenciar Datasets</h1>
+                                <p class="mb-0 opacity-75">Organize e gerencie seus datasets YOLO</p>
+                            </div>
+                        </div>
+                        <div class="row g-3 text-center">
+                            <div class="col-4">
+                                <div class="bg-white bg-opacity-10 rounded p-2">
+                                    <div class="fw-bold" id="total-datasets-count">-</div>
+                                    <div class="small opacity-75">Total</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="bg-white bg-opacity-10 rounded p-2">
+                                    <div class="fw-bold" id="total-classes-count">-</div>
+                                    <div class="small opacity-75">Classes</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="bg-white bg-opacity-10 rounded p-2">
+                                    <div class="fw-bold" id="total-files-count">-</div>
+                                    <div class="small opacity-75">Arquivos</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <a href="{{ url_for('ui.create_dataset_page') }}" class="btn btn-light btn-lg px-4 py-3 rounded-pill shadow">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Novo Dataset
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Controles e Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-lg-4">
+                            <label for="search-input" class="form-label fw-semibold">
+                                <i class="bi bi-search me-1"></i> Buscar Datasets
+                            </label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="search-input" placeholder="Nome, classe ou caminho...">
+                                <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="sort-select" class="form-label fw-semibold">
+                                <i class="bi bi-sort-down me-1"></i> Ordenar Por
+                            </label>
+                            <select class="form-select" id="sort-select">
+                                <option value="created_at">Data de Criação (Mais Recente)</option>
+                                <option value="name">Nome (A-Z)</option>
+                                <option value="nc">Número de Classes</option>
+                                <option value="file_count">Número de Arquivos</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2">
+                            <label for="view-mode" class="form-label fw-semibold">
+                                <i class="bi bi-grid me-1"></i> Visualização
+                            </label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="view-mode" id="view-cards" value="cards" checked>
+                                <label class="btn btn-outline-primary" for="view-cards">
+                                    <i class="bi bi-grid-3x3-gap"></i>
+                                </label>
+                                <input type="radio" class="btn-check" name="view-mode" id="view-table" value="table">
+                                <label class="btn btn-outline-primary" for="view-table">
+                                    <i class="bi bi-table"></i>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-gear me-1"></i> Ações
+                            </label>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary" onclick="loadDatasets()">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>
+                                    Atualizar
+                                </button>
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" onclick="exportDatasets()"><i class="bi bi-download me-2"></i>Exportar Lista</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="bulkActions()"><i class="bi bi-check2-square me-2"></i>Ações em Lote</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Datasets Content -->
+    <div class="row">
+        <div class="col-12">
+            <!-- Loading State -->
+            <div id="datasets-loading" class="text-center py-5">
+                <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"></div>
+                <h5 class="text-muted">Carregando datasets...</h5>
+                <p class="text-muted">Aguarde enquanto buscamos seus dados</p>
+            </div>
+            
+            <!-- Cards View -->
+            <div id="datasets-cards" style="display: none;">
+                <div class="row" id="datasets-cards-container">
+                    <!-- Cards will be populated here -->
+                </div>
+            </div>
+            
+            <!-- Table View -->
+            <div id="datasets-table-view" style="display: none;">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="bi bi-table me-2"></i>
+                            Lista de Datasets
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="border-0">Dataset</th>
+                                        <th class="border-0">Classes</th>
+                                        <th class="border-0">Arquivos</th>
+                                        <th class="border-0">Criado em</th>
+                                        <th class="border-0 text-center">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="datasets-tbody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Empty State -->
+            <div id="datasets-empty" style="display: none;" class="text-center py-5">
+                <div class="empty-state">
+                    <div class="icon-wrapper bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 100px; height: 100px;">
+                        <i class="bi bi-collection display-1 text-primary"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Nenhum dataset encontrado</h4>
+                    <p class="text-muted mb-4">Crie seu primeiro dataset para começar a treinar modelos YOLO</p>
+                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                        <a href="{{ url_for('ui.create_dataset_page') }}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Criar Primeiro Dataset
+                        </a>
+                        <button class="btn btn-outline-secondary btn-lg" onclick="loadDatasets()">
+                            <i class="bi bi-arrow-clockwise me-2"></i>
+                            Tentar Novamente
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pagination -->
+            <div id="pagination-container" style="display: none;" class="d-flex justify-content-between align-items-center mt-4 p-3 bg-light rounded">
+                <div class="small text-muted" id="pagination-info">
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0" id="pagination">
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dataset Details Modal -->
+<div class="modal fade" id="datasetModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="datasetModalTitle">Detalhes do Dataset</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="datasetModalBody">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary" id="editDatasetBtn">Editar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir este dataset?</p>
+                <p class="text-danger"><strong>Esta ação não pode ser desfeita!</strong></p>
+                <p class="small text-muted">O dataset <span id="deleteDatasetName"></span> será permanentemente removido.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+    .hero-header {
+        position: relative;
+        overflow: hidden;
+    }
+    .dataset-card {
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .dataset-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    .dataset-card .card-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom: 2px solid #dee2e6;
+    }
+    .class-tag {
+        font-size: 0.75rem;
+        margin: 2px;
+    }
+    .stats-badge {
+        background: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+        border: 1px solid rgba(13, 110, 253, 0.2);
+    }
+    .empty-state {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    .action-btn {
+        transition: all 0.2s ease;
+    }
+    .action-btn:hover {
+        transform: scale(1.05);
+    }
+</style>
+
+<script>
+    let currentPage = 1;
+    let currentDatasets = [];
+    let datasetToDelete = null;
+    let currentViewMode = 'cards';
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDatasets();
+        setupEventListeners();
+        loadStatistics();
+    });
+    
+    function setupEventListeners() {
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', debounce(function() {
+            currentPage = 1;
+            loadDatasets();
+        }, 300));
+        
+        // Sort functionality
+        document.getElementById('sort-select').addEventListener('change', function() {
+            currentPage = 1;
+            loadDatasets();
+        });
+        
+        // View mode toggle
+        document.querySelectorAll('input[name=\"view-mode\"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                currentViewMode = this.value;
+                if (currentDatasets.length > 0) {
+                    renderDatasets({ datasets: currentDatasets });
+                }
+            });
+        });
+    }
+    
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    function loadStatistics() {
+        console.log('Loading statistics...');
+        
+        // Load dashboard statistics for header
+        Promise.all([
+            fetch('/api/datasets/stats').then(r => {
+                console.log('Datasets stats response status:', r.status);
+                return r.json();
+            }).catch(err => {
+                console.error('Error fetching datasets stats:', err);
+                return { success: false };
+            }),
+            fetch('/api/trainings/stats').then(r => r.json()).catch(() => ({ success: false }))
+        ]).then(([datasetsStats, trainingStats]) => {
+            console.log('Datasets stats result:', datasetsStats);
+            
+            if (datasetsStats.success) {
+                document.getElementById('total-datasets-count').textContent = datasetsStats.stats.total_datasets || 0;
+                document.getElementById('total-classes-count').textContent = datasetsStats.stats.total_classes || 0;
+                document.getElementById('total-files-count').textContent = datasetsStats.stats.total_files || 0;
+            } else {
+                // Fallback: try to get basic count from datasets API
+                console.log('Using fallback for datasets stats');
+                fetch('/api/datasets?per_page=1').then(r => r.json()).then(data => {
+                    document.getElementById('total-datasets-count').textContent = data.total || 0;
+                    document.getElementById('total-classes-count').textContent = '0';
+                    document.getElementById('total-files-count').textContent = '0';
+                }).catch(err => {
+                    console.error('Fallback also failed:', err);
+                    document.getElementById('total-datasets-count').textContent = '0';
+                    document.getElementById('total-classes-count').textContent = '0';
+                    document.getElementById('total-files-count').textContent = '0';
+                });
+            }
+        }).catch(error => {
+            console.error('Error loading statistics:', error);
+            // Set to 0 in case of error
+            document.getElementById('total-datasets-count').textContent = '0';
+            document.getElementById('total-classes-count').textContent = '0';
+            document.getElementById('total-files-count').textContent = '0';
+        });
+    }
+    
+    function loadDatasets(page = 1) {
+        currentPage = page;
+        const search = document.getElementById('search-input').value;
+        const sort = document.getElementById('sort-select').value;
+        
+        showLoadingState();
+        
+        let url = `/api/datasets?page=${page}&per_page=12`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+        if (sort) url += `&sort=${sort}`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                currentDatasets = data.datasets;
+                renderDatasets(data);
+                loadStatistics(); // Refresh statistics
+            })
+            .catch(error => {
+                console.error('Error loading datasets:', error);
+                showAlert('Erro ao carregar datasets', 'danger');
+                showEmptyState();
+            })
+            .finally(() => {
+                hideLoadingState();
+            });
+    }
+    
+    function showLoadingState() {
+        document.getElementById('datasets-loading').style.display = 'block';
+        document.getElementById('datasets-cards').style.display = 'none';
+        document.getElementById('datasets-table-view').style.display = 'none';
+        document.getElementById('datasets-empty').style.display = 'none';
+        document.getElementById('pagination-container').style.display = 'none';
+    }
+    
+    function hideLoadingState() {
+        document.getElementById('datasets-loading').style.display = 'none';
+    }
+    
+    function showEmptyState() {
+        document.getElementById('datasets-empty').style.display = 'block';
+    }
+    
+    function renderDatasets(data) {
+        if (data.datasets.length === 0) {
+            showEmptyState();
+            return;
+        }
+        
+        if (currentViewMode === 'cards') {
+            renderCardsView(data);
+        } else {
+            renderTableView(data);
+        }
+        
+        renderPagination(data);
+    }
+    
+    function renderCardsView(data) {
+        const container = document.getElementById('datasets-cards-container');
+        
+        const cardsHtml = data.datasets.map(dataset => {
+            const classesPreview = dataset.classes.slice(0, 6).map(cls => 
+                `<span class="badge bg-secondary class-tag">${cls.class_name}</span>`
+            ).join('');
+            
+            const moreClasses = dataset.classes.length > 6 ? 
+                `<span class="badge bg-light text-dark class-tag">+${dataset.classes.length - 6} mais</span>` : '';
+                
+            const fileDistribution = dataset.file_counts ? `
+                <div class="mb-3">
+                    <div class="small text-muted mb-2">Distribuição de Arquivos:</div>
+                    <div class="d-flex gap-2 small">
+                        <span class="badge bg-primary">Train: ${dataset.file_counts.train || 0}</span>
+                        <span class="badge bg-success">Val: ${dataset.file_counts.val || 0}</span>
+                        <span class="badge bg-info">Test: ${dataset.file_counts.test || 0}</span>
+                    </div>
+                </div>
+            ` : '';
+            
+            return `
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card dataset-card h-100">
+                        <div class="card-header border-0">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title fw-bold mb-1">${dataset.name}</h6>
+                                    <p class="small text-muted mb-0">
+                                        <i class="bi bi-folder me-1"></i>
+                                        ${dataset.path.length > 30 ? dataset.path.substring(0, 30) + '...' : dataset.path}
+                                    </p>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-link text-muted p-1" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#" onclick="viewDataset(${dataset.id})"><i class="bi bi-eye me-2"></i>Ver Detalhes</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="downloadYaml(${dataset.id})"><i class="bi bi-download me-2"></i>Baixar YAML</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="confirmDelete(${dataset.id}, '${dataset.name}')"><i class="bi bi-trash me-2"></i>Excluir</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2 mb-3">
+                                <div class="col-4">
+                                    <div class="text-center p-2 stats-badge rounded">
+                                        <div class="fw-bold">${dataset.nc}</div>
+                                        <div class="small">Classes</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="text-center p-2 stats-badge rounded">
+                                        <div class="fw-bold">${dataset.file_count || 0}</div>
+                                        <div class="small">Arquivos</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="text-center p-2 stats-badge rounded">
+                                        <div class="fw-bold">${calculateTotalSplits(dataset.file_counts)}</div>
+                                        <div class="small">Splits</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            ${fileDistribution}
+                            
+                            <div class="mb-3">
+                                <div class="small text-muted mb-2">Classes:</div>
+                                <div class="classes-container" style="max-height: 60px; overflow-y: auto;">
+                                    ${classesPreview}
+                                    ${moreClasses}
+                                </div>
+                            </div>
+                            
+                            <div class="small text-muted mb-3">
+                                <i class="bi bi-calendar me-1"></i>
+                                Criado em ${formatDateTime(dataset.created_at)}
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary btn-sm flex-fill action-btn" onclick="viewDataset(${dataset.id})">
+                                    <i class="bi bi-eye me-1"></i> Ver
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm action-btn" onclick="downloadYaml(${dataset.id})">
+                                    <i class="bi bi-download"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm action-btn" onclick="confirmDelete(${dataset.id}, '${dataset.name}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        container.innerHTML = cardsHtml;
+        document.getElementById('datasets-cards').style.display = 'block';
+        document.getElementById('datasets-table-view').style.display = 'none';
+    }
+    
+    function renderTableView(data) {
+        const tbody = document.getElementById('datasets-tbody');
+        
+        const tableHtml = data.datasets.map(dataset => `
+            <tr>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                            <i class="bi bi-collection text-primary"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold">${dataset.name}</div>
+                            <div class="small text-muted">${dataset.path}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="badge bg-primary rounded-pill">${dataset.nc} classes</span>
+                    <div class="small text-muted mt-1" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        ${dataset.classes.map(cls => cls.class_name).join(', ')}
+                    </div>
+                </td>
+                <td>
+                    <div class="fw-semibold">${dataset.file_count} arquivos</div>
+                    <div class="small text-muted">
+                        ${dataset.file_counts ? 
+                            `Train: ${dataset.file_counts.train || 0}, Val: ${dataset.file_counts.val || 0}, Test: ${dataset.file_counts.test || 0}` 
+                            : 'Contagem não disponível'}
+                    </div>
+                </td>
+                <td>
+                    <div class="small">${formatDateTime(dataset.created_at)}</div>
+                </td>
+                <td class="text-center">
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary" onclick="viewDataset(${dataset.id})" title="Ver Detalhes">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="downloadYaml(${dataset.id})" title="Baixar YAML">
+                            <i class="bi bi-download"></i>
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="confirmDelete(${dataset.id}, '${dataset.name}')" title="Excluir">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+        
+        tbody.innerHTML = tableHtml;
+        document.getElementById('datasets-table-view').style.display = 'block';
+        document.getElementById('datasets-cards').style.display = 'none';
+    }
+    
+    function calculateTotalSplits(fileCounts) {
+        if (!fileCounts) return 0;
+        let count = 0;
+        if (fileCounts.train && fileCounts.train > 0) count++;
+        if (fileCounts.val && fileCounts.val > 0) count++;
+        if (fileCounts.test && fileCounts.test > 0) count++;
+        return count;
+    }
+    
+    function clearSearch() {
+        document.getElementById('search-input').value = '';
+        currentPage = 1;
+        loadDatasets();
+    }
+    
+    function exportDatasets() {
+        showAlert('Funcionalidade de exportação em desenvolvimento', 'info');
+    }
+    
+    function bulkActions() {
+        showAlert('Ações em lote em desenvolvimento', 'info');
+    }
+    
+    function renderPagination(data) {
+        const paginationInfo = document.getElementById('pagination-info');
+        const pagination = document.getElementById('pagination');
+        const paginationContainer = document.getElementById('pagination-container');
+        
+        // Check if we have the required pagination data
+        if (!data || !data.hasOwnProperty('total') || !data.hasOwnProperty('current_page') || !data.hasOwnProperty('pages')) {
+            paginationContainer.style.display = 'none';
+            return;
+        }
+        
+        if (data.datasets.length === 0) {
+            paginationContainer.style.display = 'none';
+            return;
+        }
+        
+        const start = (data.current_page - 1) * 12 + 1;
+        const end = Math.min(start + 11, data.total);
+        
+        paginationInfo.textContent = `Mostrando ${start}-${end} de ${data.total} datasets`;
+        
+        let paginationHtml = '';
+        
+        if (data.current_page > 1) {
+            paginationHtml += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="loadDatasets(${data.current_page - 1})">Anterior</a>
+                </li>
+            `;
+        }
+        
+        for (let i = Math.max(1, data.current_page - 2); i <= Math.min(data.pages, data.current_page + 2); i++) {
+            paginationHtml += `
+                <li class="page-item ${i === data.current_page ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="loadDatasets(${i})">${i}</a>
+                </li>
+            `;
+        }
+        
+        if (data.current_page < data.pages) {
+            paginationHtml += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="loadDatasets(${data.current_page + 1})">Próximo</a>
+                </li>
+            `;
+        }
+        
+        pagination.innerHTML = paginationHtml;
+        paginationContainer.style.display = 'flex';
+    }
+    
+    function viewDataset(datasetId) {
+        fetch(`/api/datasets/${datasetId}`)
+            .then(response => response.json())
+            .then(dataset => {
+                document.getElementById('datasetModalTitle').textContent = `Dataset: ${dataset.name}`;
+                
+                const modalBody = document.getElementById('datasetModalBody');
+                modalBody.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Informações Básicas</h6>
+                            <p><strong>Nome:</strong> ${dataset.name}</p>
+                            <p><strong>Caminho:</strong> ${dataset.path}</p>
+                            <p><strong>Número de Classes:</strong> ${dataset.nc}</p>
+                            <p><strong>Criado em:</strong> ${formatDateTime(dataset.created_at)}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Arquivos por Split</h6>
+                            <p><strong>Train:</strong> ${dataset.file_counts?.train || 0} arquivos</p>
+                            <p><strong>Validation:</strong> ${dataset.file_counts?.val || 0} arquivos</p>
+                            <p><strong>Test:</strong> ${dataset.file_counts?.test || 0} arquivos</p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6>Classes</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                ${dataset.classes.map(cls => 
+                                    `<span class="badge bg-secondary">${cls.class_index}: ${cls.class_name}</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('editDatasetBtn').onclick = () => {
+                    window.location.href = `/datasets/edit/${datasetId}`;
+                };
+                
+                new bootstrap.Modal(document.getElementById('datasetModal')).show();
+            })
+            .catch(error => {
+                console.error('Error loading dataset details:', error);
+                showAlert('Erro ao carregar detalhes do dataset', 'danger');
+            });
+    }
+    
+    function downloadYaml(datasetId) {
+        fetch(`/api/datasets/${datasetId}/yaml`)
+            .then(response => response.json())
+            .then(data => {
+                const blob = new Blob([data.yaml_content], { type: 'text/yaml' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `dataset_${datasetId}.yaml`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                showAlert('YAML baixado com sucesso', 'success');
+            })
+            .catch(error => {
+                console.error('Error downloading YAML:', error);
+                showAlert('Erro ao baixar YAML', 'danger');
+            });
+    }
+    
+    function confirmDelete(datasetId, datasetName) {
+        datasetToDelete = datasetId;
+        document.getElementById('deleteDatasetName').textContent = datasetName;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+    
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (datasetToDelete) {
+            deleteDataset(datasetToDelete);
+        }
+    });
+    
+    function deleteDataset(datasetId) {
+        fetch(`/api/datasets/${datasetId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showAlert(data.error, 'danger');
+            } else {
+                showAlert('Dataset excluído com sucesso', 'success');
+                loadDatasets(currentPage);
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting dataset:', error);
+            showAlert('Erro ao excluir dataset', 'danger');
+        })
+        .finally(() => {
+            bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+            datasetToDelete = null;
+        });
+    }
+</script>
+{% endblock %}
