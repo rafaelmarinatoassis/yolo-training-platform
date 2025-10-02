@@ -30,6 +30,7 @@ O **YOLO Training Platform** é uma plataforma web moderna e intuitiva para trei
 - ✅ **WebSocket Live**: Atualizações em tempo real via WebSocket
 - ✅ **Histórico Completo**: Acompanhamento de todos os treinamentos realizados
 - ✅ **Navegação Intuitiva**: Fluxo de trabalho otimizado e fácil de usar
+- ✅ **Setup Automatizado**: Scripts Windows que fazem toda instalação automaticamente
 
 ### 🏗️ Arquitetura
 
@@ -85,7 +86,7 @@ git --version
 - **Python**: Baixe em [python.org](https://www.python.org/downloads/) (marque "Add to PATH")
 - **Git**: Baixe em [git-scm.com](https://git-scm.com/downloads)
 
-### Instalação Rápida
+### 🐧 **Instalação Manual (Linux/Mac/Windows)**
 
 ```bash
 # 1. Clone o repositório
@@ -117,7 +118,49 @@ python run.py
 pip install -r requirements-dev.txt
 ```
 
-### Instalação Detalhada
+### ⚡ **Instalação Automatizada (Windows)**
+
+Para usuários Windows, criamos scripts que fazem **tudo automaticamente**:
+
+#### 🚀 **Setup Completo** (Primeira vez)
+```batch
+# Execute uma única vez para configurar tudo:
+start.bat
+```
+
+**O que o script faz:**
+- ✅ Verifica se Python e pip estão instalados
+- ✅ Cria ambiente virtual automaticamente
+- ✅ Ativa o ambiente virtual  
+- ✅ Atualiza pip para versão mais recente
+- ✅ Instala todas as dependências do requirements.txt
+- ✅ Testa se imports principais funcionam
+- ✅ Inicia o servidor automaticamente
+- 🌐 Abre em http://localhost:5000
+
+**💡 Nota:** Scripts usam caracteres ASCII para máxima compatibilidade com terminal Windows.
+
+#### 🔄 **Inicialização Rápida** (Próximas vezes)
+```batch
+# Para usar depois do setup inicial:
+dev.bat
+```
+
+**Vantagens dos scripts:**
+- 🎯 **Zero configuração manual** - Tudo automatizado
+- 🛡️ **Verificações automáticas** - Detecta problemas comuns
+- 📊 **Feedback visual** - Mostra progresso em tempo real
+- ⚠️ **Tratamento de erros** - Instruções claras se algo falhar
+- ⏱️ **Economia de tempo** - 1 clique vs múltiplos comandos
+- 💻 **Compatibilidade total** - ASCII puro para todos os terminais Windows
+
+**🔧 Detalhes técnicos dos scripts:**
+- Usa `chcp 65001` para UTF-8
+- Caracteres ASCII para compatibilidade com CMD/PowerShell
+- Verificações robustas de erro em cada etapa
+- Fallback automático entre PowerShell e CMD
+
+### 🐧 **Instalação Manual (Linux/Mac/Windows)**
 
 <details>
 <summary>Clique para ver instruções detalhadas</summary>
@@ -173,25 +216,55 @@ mkdir -p data/datasets data/models data/tests
 
 ### ⚡ **Início Rápido (Para Iniciantes)**
 
+#### 🪟 **Windows - Super Simples:**
 1. **Baixe e instale Python** em [python.org](https://www.python.org/downloads/) (marque "Add to PATH")
 2. **Baixe e instale Git** em [git-scm.com](https://git-scm.com/downloads)
-3. **Abra o Terminal/PowerShell** e execute os comandos da seção "Instalação Rápida"
-4. **Aguarde as instalações** (pode demorar alguns minutos)
-5. **Acesse** http://localhost:5000 no seu navegador
+3. **Clone o projeto:** `git clone https://github.com/rafaelmarinatoassis/yolo-training-platform.git`
+4. **Entre na pasta:** `cd yolo-training-platform`
+5. **Execute:** `start.bat` (faz tudo automaticamente!)
+6. **Acesse:** http://localhost:5000 no navegador
 
-**💡 Primeira vez usando?** Não se preocupe! O processo é automatizado e a interface é intuitiva.
+#### 🐧 **Linux/Mac - Manual:**
+1. **Baixe e instale Python** (se não tiver)
+2. **Baixe e instale Git** (se não tiver)
+3. **Execute os comandos** da seção "Instalação Manual"
+4. **Aguarde as instalações** (pode demorar alguns minutos)
+5. **Acesse** http://localhost:5000 no navegador
+
+**💡 Primeira vez usando?** 
+- **Windows**: O script `start.bat` é **completamente automático**!
+- **Linux/Mac**: Processo é simples e bem documentado
+- A interface é intuitiva e auto-explicativa
 
 ## 📖 Como Usar
 
 ### 1. Iniciando a Aplicação
 
+#### 🪟 **Windows - Modo Automatizado (Recomendado)**
+```batch
+# Primeira vez (setup completo):
+start.bat
+
+# Próximas vezes (apenas iniciar):
+dev.bat
+```
+
+#### 🐧 **Linux/Mac/Windows - Modo Manual**
 ```bash
+# Ativar ambiente virtual primeiro
+source .venv/bin/activate  # Linux/Mac
+.venv\Scripts\Activate.ps1  # Windows PowerShell
+
+# Depois executar
 python run.py
 ```
 
 🌐 **Acesse:** `http://localhost:5000`
 
-**⚠️ Importante:** Mantenha o terminal aberto enquanto usa a aplicação!
+**⚠️ Importante:** 
+- **Windows**: Use `start.bat` na primeira vez, depois `dev.bat`
+- **Linux/Mac**: Sempre ative o ambiente virtual antes de executar
+- Mantenha o terminal aberto enquanto usa a aplicação!
 
 ### 2. Fluxo de Trabalho
 
@@ -340,7 +413,70 @@ docker run -p 5000:5000 yolo-training-platform
 
 ## 🐛 Solução de Problemas
 
-### Problemas Comuns
+### 🪟 **Problemas com Scripts Automatizados (Windows)**
+
+<details>
+<summary>❌ start.bat não executa / "Python não encontrado"</summary>
+
+**Causa:** Python não está instalado ou não está no PATH.
+
+**Solução:**
+1. Baixe Python em [python.org](https://www.python.org/downloads/)
+2. ✅ **IMPORTANTE:** Marque "Add Python to PATH" durante instalação
+3. Reinicie o terminal/cmd
+4. Execute `start.bat` novamente
+
+</details>
+
+<details>
+<summary>❌ "pip não encontrado" ou erro de dependências</summary>
+
+**Causa:** Instalação de Python incompleta.
+
+**Solução:**
+```batch
+# Verificar se pip está disponível
+pip --version
+
+# Se não funcionar, reinstalar Python com pip incluído
+# Ou executar:
+python -m ensurepip --upgrade
+```
+
+</details>
+
+<details>
+<summary>❌ "Falha ao ativar ambiente virtual"</summary>
+
+**Causa:** Política de execução do PowerShell.
+
+**Solução:**
+```batch
+# Executar PowerShell como administrador e executar:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Ou usar dev.bat que usa CMD ao invés de PowerShell
+```
+
+</details>
+
+<details>
+<summary>❌ Script trava na instalação de dependências</summary>
+
+**Causa:** Download lento ou dependência específica falhando.
+
+**Solução:**
+1. Aguardar mais tempo (PyTorch é grande ~2GB)
+2. Verificar conexão de internet
+3. Executar instalação manual:
+```bash
+.venv\Scripts\activate.bat
+pip install -r requirements.txt
+```
+
+</details>
+
+### ⚡ **Problemas Gerais**
 
 <details>
 <summary>❌ Erro de import do ultralytics</summary>
