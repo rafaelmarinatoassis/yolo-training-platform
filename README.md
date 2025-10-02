@@ -111,6 +111,12 @@ pip install -r requirements.txt
 python run.py
 ```
 
+**📦 Para desenvolvimento (opcional):**
+```bash
+# Instalar dependências de desenvolvimento (debugging, testes, etc.)
+pip install -r requirements-dev.txt
+```
+
 ### Instalação Detalhada
 
 <details>
@@ -261,6 +267,11 @@ python run.py
 - **Ultralytics YOLOv8**: Framework de detecção de objetos
 - **pandas**: Manipulação de dados CSV
 - **Pillow**: Processamento de imagens
+- **PyTorch**: Framework de deep learning
+- **OpenCV**: Processamento de imagem e vídeo
+- **NumPy**: Computação científica
+- **Matplotlib/Seaborn**: Visualização de dados
+- **Redis/RQ**: Fila de tarefas para processamento assíncrono
 
 ### Frontend
 - **Bootstrap 5.3**: Framework CSS responsivo
@@ -289,9 +300,22 @@ MAX_UPLOAD_SIZE=100MB
 
 ### Configuração de GPU
 
+**Para GPU NVIDIA (recomendado para treinamentos rápidos):**
 ```bash
-# Para usar GPU NVIDIA (opcional)
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+# Verificar se CUDA está disponível
+python -c "import torch; print('CUDA disponível:', torch.cuda.is_available())"
+
+# Se não estiver disponível, instalar PyTorch com suporte CUDA
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+
+# Verificar novamente
+python -c "import torch; print('CUDA:', torch.cuda.is_available(), 'Dispositivos:', torch.cuda.device_count())"
+```
+
+**Para CPU apenas (funciona, mas mais lento):**
+```bash
+# PyTorch CPU-only (já incluído no requirements.txt)
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 ```
 
 ### Configuração de Produção
