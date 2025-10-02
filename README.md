@@ -465,7 +465,7 @@ in the Software without restriction...
 
 ## 👥 Autores
 
-- **Rafael Marina** - *Desenvolvimento inicial* - [@rafaelmarinatoassis](https://github.com/rafaelmarinatoassis)
+- **Rafael Marinato Assis** - *Desenvolvimento inicial* - [@rafaelmarinatoassis](https://github.com/rafaelmarinatoassis)
 
 ## 🙏 Agradecimentos
 
