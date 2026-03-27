@@ -459,7 +459,7 @@
             case 'running': return 'bi-play-circle-fill';
             case 'completed': return 'bi-check-circle-fill';
             case 'failed': return 'bi-x-circle-fill';
-            case 'pending': return 'bi-clock-fill';
+            case 'queued': return 'bi-clock-fill';
             default: return 'bi-circle-fill';
         }
     }
@@ -469,7 +469,7 @@
             case 'running': return 'text-primary';
             case 'completed': return 'text-success';
             case 'failed': return 'text-danger';
-            case 'pending': return 'text-warning';
+            case 'queued': return 'text-warning';
             default: return 'text-secondary';
         }
     }
@@ -479,7 +479,7 @@
             case 'running': return 'Executando';
             case 'completed': return 'Concluído';
             case 'failed': return 'Falhou';
-            case 'pending': return 'Pendente';
+            case 'queued': return 'Em fila';
             default: return status;
         }
     }

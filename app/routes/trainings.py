@@ -2,7 +2,9 @@ from flask import Blueprint, request, jsonify, Response, send_file
 from flask_socketio import emit, join_room, leave_room
 import json
 import os
+import shutil
 from datetime import datetime
+from sqlalchemy import func
 from app import db, socketio
 from app.models import Training, TrainingMetric, Checkpoint, Dataset
 from app.services.trainer import TrainingService
@@ -20,7 +22,8 @@ def list_trainings():
     per_page = request.args.get('per_page', 10, type=int)
     status_filter = request.args.get('status')
     dataset_id = request.args.get('dataset_id', type=int)
-    
+    sort = request.args.get('sort', 'created_at')
+
     query = Training.query
     
     if status_filter:
@@ -29,7 +32,14 @@ def list_trainings():
     if dataset_id:
         query = query.filter(Training.dataset_id == dataset_id)
     
-    trainings = query.order_by(Training.created_at.desc()).paginate(
+    sort_options = {
+        'created_at': Training.created_at.desc(),
+        'started_at': Training.started_at.desc(),
+        'finished_at': Training.finished_at.desc()
+    }
+    query = query.order_by(sort_options.get(sort, Training.created_at.desc()))
+
+    trainings = query.paginate(
         page=page, per_page=per_page, error_out=False
     )
     
@@ -70,6 +80,8 @@ def create_training():
     """Create a new training job"""
     try:
         data = request.get_json()
+        if not data:
+            return jsonify({'error': 'JSON body is required'}), 400
         
         dataset_id = data.get('dataset_id')
         if not dataset_id:
@@ -105,14 +117,34 @@ def create_training():
                 return float(value)
             except (ValueError, TypeError):
                 return default
+
+        def infer_task_type(model_name, fallback='detect'):
+            name = (model_name or '').lower()
+            if '-seg' in name:
+                return 'segment'
+            if '-cls' in name:
+                return 'classify'
+            if '-pose' in name:
+                return 'pose'
+            return fallback
         
         # Create training record
+        requested_model_name = (data.get('model_name') or '').strip()
+        requested_task_type = (data.get('task_type') or data.get('task') or '').strip()
+        inferred_task_type = infer_task_type(requested_model_name, requested_task_type or 'detect')
+
+        # Fallback to current convention when custom name is not provided.
+        task_for_name = inferred_task_type
+        task_suffix = '' if task_for_name == 'detect' else f'-{task_for_name}'
+        default_model_name = f"yolov8{data.get('model_version', 'm')}{task_suffix}.pt"
+        model_name = requested_model_name or default_model_name
+
         training = Training(
             dataset_id=convert_to_int(dataset_id, 0),
             
             # Model configuration
             model_version=data.get('model_version', 'm'),
-            task_type=data.get('task_type', 'detect'),
+            task_type=inferred_task_type,
             device=data.get('device', 'auto'),
             
             # Training parameters
@@ -139,6 +171,7 @@ def create_training():
             'save_checkpoints': training.save_checkpoints,
             'use_augmentation': training.use_augmentation,
             'model_version': training.model_version,
+            'model_name': model_name,
             'task_type': training.task_type,
             'device': training.device
         }
@@ -234,7 +267,82 @@ def stream_training_logs(training_id):
         elif training.status == 'running':
             yield f"data: Training is currently running\n\n"
     
-    return Response(generate(), mimetype='text/plain')
+    return Response(
+        generate(),
+        mimetype='text/event-stream',
+        headers={'Cache-Control': 'no-cache', 'Connection': 'keep-alive'}
+    )
+
+
+@trainings_bp.route('/trainings/stats', methods=['GET'])
+def get_trainings_stats():
+    """Get trainings summary stats"""
+    try:
+        grouped = dict(
+            db.session.query(Training.status, func.count(Training.id))
+            .group_by(Training.status)
+            .all()
+        )
+
+        total = sum(grouped.values())
+        queued = grouped.get('queued', 0)
+        running = grouped.get('running', 0)
+        completed = grouped.get('completed', 0)
+        failed = grouped.get('failed', 0)
+        canceled = grouped.get('canceled', 0)
+
+        payload = {
+            'success': True,
+            'total': total,
+            'queued': queued,
+            'running': running,
+            'completed': completed,
+            'failed': failed,
+            'canceled': canceled,
+            'stats': {
+                'total': total,
+                'queued': queued,
+                'running': running,
+                'completed': completed,
+                'failed': failed,
+                'canceled': canceled
+            }
+        }
+        return jsonify(payload)
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@trainings_bp.route('/system/info', methods=['GET'])
+def get_system_info():
+    """Basic system info for MVP dashboard widgets"""
+    try:
+        try:
+            import psutil  # Optional dependency
+            cpu_percent = psutil.cpu_percent(interval=0.2)
+            memory_percent = psutil.virtual_memory().percent
+            disk_percent = psutil.disk_usage('.').percent
+        except Exception:
+            cpu_percent = None
+            memory_percent = None
+            total, used, _ = shutil.disk_usage('.')
+            disk_percent = round((used / total) * 100, 1) if total else None
+
+        gpu_available = False
+        try:
+            import torch
+            gpu_available = bool(torch.cuda.is_available())
+        except Exception:
+            gpu_available = False
+
+        return jsonify({
+            'cpu_percent': cpu_percent,
+            'memory_percent': memory_percent,
+            'disk_percent': disk_percent,
+            'gpu_available': gpu_available
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @trainings_bp.route('/trainings/<int:training_id>/download_model', methods=['GET'])

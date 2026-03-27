@@ -31,10 +31,14 @@ def create_app():
     from app.routes.ui import ui_bp
     from app.routes.datasets import datasets_bp
     from app.routes.trainings import trainings_bp
+    from app.routes.tests import tests_bp
+    from app.routes.models import models_bp
     
     app.register_blueprint(ui_bp)
     app.register_blueprint(datasets_bp, url_prefix='/api')
     app.register_blueprint(trainings_bp, url_prefix='/api')
+    app.register_blueprint(tests_bp, url_prefix='/api')
+    app.register_blueprint(models_bp, url_prefix='/api')
     
     # Create database tables
     with app.app_context():

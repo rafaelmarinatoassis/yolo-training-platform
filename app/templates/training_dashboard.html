@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Dashboard - Training {{ training.id }}{% endblock %}
 
@@ -8,12 +8,12 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
-                <h2><i class="fas fa-chart-line"></i> Dashboard - Training {{ training.id }}</h2>
+                <h2><i class="bi bi-graph-up"></i> Dashboard - Training {{ training.id }}</h2>
                 <div>
                     <a href="/training/{{ training_id }}/details" class="btn btn-outline-secondary me-2">
-                        <i class="fas fa-arrow-left"></i> Voltar
+                        <i class="bi bi-arrow-left"></i> Voltar
                     </a>
-                    <span class="badge badge-{{ 'success' if training.status == 'completed' else 'warning' if training.status == 'training' else 'info' }} fs-6">
+                    <span class="badge {{ 'bg-success' if training.status == 'completed' else 'bg-warning' if training.status == 'running' else 'bg-info' }} fs-6">
                         {{ training.status.title() }}
                     </span>
                 </div>
@@ -39,7 +39,7 @@
                     </div>
                     <div class="row text-center">
                         <div class="col-md-3">
-                            <strong>Época Atual</strong><br>
+                            <strong>Ã‰poca Atual</strong><br>
                             <span class="fs-3 text-primary">{{ current_epoch }}</span> / {{ training.epochs }}
                         </div>
                         <div class="col-md-3">
@@ -60,13 +60,13 @@
         </div>
     </div>
 
-    <!-- Métricas em Tempo Real -->
+    <!-- MÃ©tricas em Tempo Real -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">
-                        <i class="fas fa-chart-bar"></i> Métricas em Tempo Real
+                        <i class="bi bi-bar-chart-line"></i> MÃ©tricas em Tempo Real
                         <span class="badge bg-success ms-2" id="liveIndicator">LIVE</span>
                     </h5>
                 </div>
@@ -77,7 +77,7 @@
                                 <div class="card-body text-center">
                                     <h6>Training Loss</h6>
                                     <h2 id="currentLoss">-</h2>
-                                    <small>Última atualização: <span id="lossTime">-</span></small>
+                                    <small>Ãšltima atualizaÃ§Ã£o: <span id="lossTime">-</span></small>
                                 </div>
                             </div>
                         </div>
@@ -87,7 +87,7 @@
                                 <div class="card-body text-center">
                                     <h6>mAP50 (%)</h6>
                                     <h2 id="currentMap50">-</h2>
-                                    <small>Última atualização: <span id="map50Time">-</span></small>
+                                    <small>Ãšltima atualizaÃ§Ã£o: <span id="map50Time">-</span></small>
                                 </div>
                             </div>
                         </div>
@@ -95,9 +95,9 @@
                         <div class="col-lg-3 col-md-6 mb-3">
                             <div class="card bg-info text-white">
                                 <div class="card-body text-center">
-                                    <h6>Precisão (%)</h6>
+                                    <h6>PrecisÃ£o (%)</h6>
                                     <h2 id="currentPrecision">-</h2>
-                                    <small>Última atualização: <span id="precisionTime">-</span></small>
+                                    <small>Ãšltima atualizaÃ§Ã£o: <span id="precisionTime">-</span></small>
                                 </div>
                             </div>
                         </div>
@@ -107,7 +107,7 @@
                                 <div class="card-body text-center">
                                     <h6>Recall (%)</h6>
                                     <h2 id="currentRecall">-</h2>
-                                    <small>Última atualização: <span id="recallTime">-</span></small>
+                                    <small>Ãšltima atualizaÃ§Ã£o: <span id="recallTime">-</span></small>
                                 </div>
                             </div>
                         </div>
@@ -117,61 +117,61 @@
         </div>
     </div>
 
-    <!-- Explicação das Métricas -->
+    <!-- ExplicaÃ§Ã£o das MÃ©tricas -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
                 <div class="card-header bg-info text-white">
                     <h5 class="mb-0">
-                        <i class="fas fa-info-circle"></i> Como Interpretar as Métricas
+                        <i class="bi bi-info-circle"></i> Como Interpretar as MÃ©tricas
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-6 col-md-12 mb-3">
-                            <h6 class="text-danger"><i class="fas fa-chart-line"></i> Training Loss (Erro)</h6>
-                            <p class="mb-2"><strong>O que é:</strong> Mede o quanto o modelo está "errando" durante o treinamento.</p>
+                            <h6 class="text-danger"><i class="bi bi-graph-up"></i> Training Loss (Erro)</h6>
+                            <p class="mb-2"><strong>O que Ã©:</strong> Mede o quanto o modelo estÃ¡ "errando" durante o treinamento.</p>
                             <p class="mb-2"><strong>Como ler:</strong></p>
                             <ul class="mb-2">
-                                <li><span class="badge bg-success">Diminuindo</span> = Modelo está aprendendo ✅</li>
-                                <li><span class="badge bg-warning">Estável</span> = Modelo pode ter convergido</li>
-                                <li><span class="badge bg-danger">Aumentando</span> = Possível overfitting ⚠️</li>
+                                <li><span class="badge bg-success">Diminuindo</span> = Modelo estÃ¡ aprendendo âœ…</li>
+                                <li><span class="badge bg-warning">EstÃ¡vel</span> = Modelo pode ter convergido</li>
+                                <li><span class="badge bg-danger">Aumentando</span> = PossÃ­vel overfitting âš ï¸</li>
                             </ul>
-                            <small class="text-muted"><strong>Meta:</strong> Valores menores são melhores (idealmente < 1.0)</small>
+                            <small class="text-muted"><strong>Meta:</strong> Valores menores sÃ£o melhores (idealmente < 1.0)</small>
                         </div>
                         
                         <div class="col-lg-6 col-md-12 mb-3">
-                            <h6 class="text-success"><i class="fas fa-bullseye"></i> mAP50 (Precisão Principal)</h6>
-                            <p class="mb-2"><strong>O que é:</strong> Mede a precisão geral do modelo para detectar objetos.</p>
+                            <h6 class="text-success"><i class="bi bi-bullseye"></i> mAP50 (PrecisÃ£o Principal)</h6>
+                            <p class="mb-2"><strong>O que Ã©:</strong> Mede a precisÃ£o geral do modelo para detectar objetos.</p>
                             <p class="mb-2"><strong>Como ler:</strong></p>
                             <ul class="mb-2">
-                                <li><span class="badge bg-success">> 50%</span> = Modelo muito bom ✅</li>
-                                <li><span class="badge bg-warning">30-50%</span> = Modelo razoável 👍</li>
-                                <li><span class="badge bg-danger">< 30%</span> = Precisa melhorar 📈</li>
+                                <li><span class="badge bg-success">> 50%</span> = Modelo muito bom âœ…</li>
+                                <li><span class="badge bg-warning">30-50%</span> = Modelo razoÃ¡vel ðŸ‘</li>
+                                <li><span class="badge bg-danger">< 30%</span> = Precisa melhorar ðŸ“ˆ</li>
                             </ul>
-                            <small class="text-muted"><strong>Meta:</strong> Valores maiores são melhores (máximo 100%)</small>
+                            <small class="text-muted"><strong>Meta:</strong> Valores maiores sÃ£o melhores (mÃ¡ximo 100%)</small>
                         </div>
                     </div>
                     
                     <div class="row">
                         <div class="col-lg-6 col-md-12 mb-3">
-                            <h6 class="text-info"><i class="fas fa-crosshairs"></i> Precisão (%)</h6>
-                            <p class="mb-2"><strong>O que é:</strong> Dos objetos que o modelo detectou, quantos estavam corretos?</p>
+                            <h6 class="text-info"><i class="bi bi-crosshair"></i> PrecisÃ£o (%)</h6>
+                            <p class="mb-2"><strong>O que Ã©:</strong> Dos objetos que o modelo detectou, quantos estavam corretos?</p>
                             <p class="mb-2"><strong>Como ler:</strong></p>
                             <ul class="mb-2">
-                                <li><span class="badge bg-success">Alta precisão</span> = Poucas detecções falsas ✅</li>
-                                <li><span class="badge bg-warning">Baixa precisão</span> = Muitos falsos positivos ⚠️</li>
+                                <li><span class="badge bg-success">Alta precisÃ£o</span> = Poucas detecÃ§Ãµes falsas âœ…</li>
+                                <li><span class="badge bg-warning">Baixa precisÃ£o</span> = Muitos falsos positivos âš ï¸</li>
                             </ul>
-                            <small class="text-muted"><strong>Exemplo:</strong> 80% = de 100 detecções, 80 estavam certas</small>
+                            <small class="text-muted"><strong>Exemplo:</strong> 80% = de 100 detecÃ§Ãµes, 80 estavam certas</small>
                         </div>
                         
                         <div class="col-lg-6 col-md-12 mb-3">
-                            <h6 class="text-warning"><i class="fas fa-search"></i> Recall (Sensibilidade)</h6>
-                            <p class="mb-2"><strong>O que é:</strong> Dos objetos que existiam na imagem, quantos o modelo conseguiu encontrar?</p>
+                            <h6 class="text-warning"><i class="bi bi-search"></i> Recall (Sensibilidade)</h6>
+                            <p class="mb-2"><strong>O que Ã©:</strong> Dos objetos que existiam na imagem, quantos o modelo conseguiu encontrar?</p>
                             <p class="mb-2"><strong>Como ler:</strong></p>
                             <ul class="mb-2">
-                                <li><span class="badge bg-success">Alto recall</span> = Encontra quase tudo ✅</li>
-                                <li><span class="badge bg-warning">Baixo recall</span> = Perde muitos objetos ⚠️</li>
+                                <li><span class="badge bg-success">Alto recall</span> = Encontra quase tudo âœ…</li>
+                                <li><span class="badge bg-warning">Baixo recall</span> = Perde muitos objetos âš ï¸</li>
                             </ul>
                             <small class="text-muted"><strong>Exemplo:</strong> 70% = de 100 objetos reais, encontrou 70</small>
                         </div>
@@ -180,19 +180,19 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="alert alert-light">
-                                <h6><i class="fas fa-lightbulb text-warning"></i> Dica de Interpretação:</h6>
+                                <h6><i class="bi bi-lightbulb text-warning"></i> Dica de InterpretaÃ§Ã£o:</h6>
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <strong>🎯 Modelo Ideal:</strong><br>
-                                        <small>Loss baixo, mAP50 alto, Precisão e Recall equilibrados</small>
+                                        <strong>ðŸŽ¯ Modelo Ideal:</strong><br>
+                                        <small>Loss baixo, mAP50 alto, PrecisÃ£o e Recall equilibrados</small>
                                     </div>
                                     <div class="col-md-4">
-                                        <strong>⚖️ Trade-off:</strong><br>
-                                        <small>Às vezes precisão alta = recall baixo e vice-versa</small>
+                                        <strong>âš–ï¸ Trade-off:</strong><br>
+                                        <small>Ã€s vezes precisÃ£o alta = recall baixo e vice-versa</small>
                                     </div>
                                     <div class="col-md-4">
-                                        <strong>📈 Progresso:</strong><br>
-                                        <small>Observe as tendências ao longo das épocas</small>
+                                        <strong>ðŸ“ˆ Progresso:</strong><br>
+                                        <small>Observe as tendÃªncias ao longo das Ã©pocas</small>
                                     </div>
                                 </div>
                             </div>
@@ -203,25 +203,25 @@
         </div>
     </div>
 
-    <!-- Informações do Modelo -->
+    <!-- InformaÃ§Ãµes do Modelo -->
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h5><i class="fas fa-cog"></i> Configuração do Modelo</h5>
+                    <h5><i class="bi bi-gear"></i> ConfiguraÃ§Ã£o do Modelo</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-borderless">
                         <tr>
                             <td><strong>Nome:</strong></td>
-                            <td>{{ training.model_name }}</td>
+                            <td>{{ training.get_config().get('model_name', 'yolov8' ~ training.model_version ~ ('' if training.task_type == 'detect' else '-' ~ training.task_type) ~ '.pt') }}</td>
                         </tr>
                         <tr>
                             <td><strong>Dataset:</strong></td>
                             <td>{{ training.dataset.name if training.dataset else 'N/A' }}</td>
                         </tr>
                         <tr>
-                            <td><strong>Épocas Totais:</strong></td>
+                            <td><strong>Ã‰pocas Totais:</strong></td>
                             <td>{{ training.epochs }}</td>
                         </tr>
                         <tr>
@@ -244,22 +244,22 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h5><i class="fas fa-history"></i> Histórico de Métricas</h5>
+                    <h5><i class="bi bi-clock-history"></i> HistÃ³rico de MÃ©tricas</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
                         <table class="table table-sm table-hover">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>Época</th>
+                                    <th>Ã‰poca</th>
                                     <th>Loss</th>
                                     <th>mAP50</th>
-                                    <th>Precisão</th>
+                                    <th>PrecisÃ£o</th>
                                     <th>Recall</th>
                                 </tr>
                             </thead>
                             <tbody id="metricsHistory">
-                                <!-- Será preenchido via JavaScript -->
+                                <!-- SerÃ¡ preenchido via JavaScript -->
                             </tbody>
                         </table>
                     </div>
@@ -269,7 +269,6 @@
     </div>
 </div>
 
-<script src="/static/js/socket.io.min.js"></script>
 <script>
 // Dashboard em tempo real
 const trainingId = {{ training_id }};
@@ -289,7 +288,7 @@ const metricsHistory = document.getElementById('metricsHistory');
 // Conectar ao WebSocket
 const socket = io();
 
-// Atualizar indicador de conexão
+// Atualizar indicador de conexÃ£o
 socket.on('connect', function() {
     console.log('Conectado ao WebSocket');
     liveIndicator.className = 'badge bg-success ms-2';
@@ -302,7 +301,7 @@ socket.on('disconnect', function() {
     liveIndicator.textContent = 'OFFLINE';
 });
 
-// Escutar atualizações de métricas
+// Escutar atualizaÃ§Ãµes de mÃ©tricas
 socket.on('training_update', function(data) {
     if (data.training_id === trainingId) {
         updateMetrics(data);
@@ -310,7 +309,7 @@ socket.on('training_update', function(data) {
     }
 });
 
-// Função para atualizar métricas em tempo real
+// FunÃ§Ã£o para atualizar mÃ©tricas em tempo real
 function updateMetrics(data) {
     const now = new Date().toLocaleTimeString();
     
@@ -341,7 +340,7 @@ function updateMetrics(data) {
     }, 100);
 }
 
-// Função para adicionar ao histórico
+// FunÃ§Ã£o para adicionar ao histÃ³rico
 function addToHistory(data) {
     const row = document.createElement('tr');
     row.innerHTML = `
@@ -355,7 +354,7 @@ function addToHistory(data) {
     // Adicionar no topo da tabela
     metricsHistory.insertBefore(row, metricsHistory.firstChild);
     
-    // Manter apenas as últimas 10 linhas
+    // Manter apenas as Ãºltimas 10 linhas
     while (metricsHistory.children.length > 10) {
         metricsHistory.removeChild(metricsHistory.lastChild);
     }
@@ -369,13 +368,13 @@ function loadInitialData() {
             console.log('Dados iniciais carregados:', data);
             
             if (data.metrics && data.metrics.length > 0) {
-                // Pegar a última métrica
+                // Pegar a Ãºltima mÃ©trica
                 const latest = data.metrics[data.metrics.length - 1];
                 console.log('Latest metrics:', latest);
                 console.log('Precision:', latest.precision, 'Recall:', latest.recall);
                 updateMetrics(latest);
                 
-                // Preencher histórico (últimas 10)
+                // Preencher histÃ³rico (Ãºltimas 10)
                 const recentMetrics = data.metrics.slice(-10).reverse();
                 metricsHistory.innerHTML = '';
                 recentMetrics.forEach(metric => {
@@ -392,7 +391,7 @@ function loadInitialData() {
 document.addEventListener('DOMContentLoaded', function() {
     loadInitialData();
     
-    // Adicionar animação CSS para o indicador LIVE
+    // Adicionar animaÃ§Ã£o CSS para o indicador LIVE
     const style = document.createElement('style');
     style.textContent = `
         @keyframes pulse {
@@ -407,3 +406,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+

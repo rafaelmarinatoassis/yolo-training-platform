@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify, current_app
 from werkzeug.utils import secure_filename
 import os
 import json
+from sqlalchemy import func, or_
+from sqlalchemy.orm import selectinload
 from app import db
 from app.models import Dataset, Class, DatasetFile
 from app.services.storage import StorageService
@@ -15,17 +17,94 @@ def list_datasets():
     """List all datasets with pagination"""
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
-    
-    datasets = Dataset.query.paginate(
+    search = request.args.get('search', '', type=str).strip()
+    sort = request.args.get('sort', 'created_at', type=str)
+
+    query = Dataset.query.options(selectinload(Dataset.classes))
+
+    if search:
+        query = (
+            query.outerjoin(Class, Class.dataset_id == Dataset.id)
+            .filter(
+                or_(
+                    Dataset.name.ilike(f'%{search}%'),
+                    Dataset.path.ilike(f'%{search}%'),
+                    Class.class_name.ilike(f'%{search}%')
+                )
+            )
+            .distinct()
+        )
+
+    if sort == 'file_count':
+        query = (
+            query.outerjoin(DatasetFile, DatasetFile.dataset_id == Dataset.id)
+            .group_by(Dataset.id)
+            .order_by(func.count(DatasetFile.id).desc())
+        )
+    else:
+        sort_options = {
+            'created_at': Dataset.created_at.desc(),
+            'name': Dataset.name.asc(),
+            'nc': Dataset.nc.desc()
+        }
+        query = query.order_by(sort_options.get(sort, Dataset.created_at.desc()))
+
+    datasets = query.paginate(
         page=page, per_page=per_page, error_out=False
     )
-    
+
+    dataset_ids = [dataset.id for dataset in datasets.items]
+    file_counts_by_dataset = {}
+    if dataset_ids:
+        file_counts_rows = (
+            db.session.query(DatasetFile.dataset_id, func.count(DatasetFile.id))
+            .filter(DatasetFile.dataset_id.in_(dataset_ids))
+            .group_by(DatasetFile.dataset_id)
+            .all()
+        )
+        file_counts_by_dataset = {dataset_id: count for dataset_id, count in file_counts_rows}
+
+    datasets_list = []
+    for dataset in datasets.items:
+        dataset_dict = {
+            'id': dataset.id,
+            'name': dataset.name,
+            'path': dataset.path,
+            'nc': dataset.nc,
+            'yaml_file': dataset.yaml_file,
+            'created_at': dataset.created_at.isoformat(),
+            'classes': [cls.to_dict() for cls in dataset.classes],
+            'file_count': file_counts_by_dataset.get(dataset.id, 0)
+        }
+        dataset_dict['file_counts'] = storage.get_dataset_files_count(dataset.path)
+        datasets_list.append(dataset_dict)
+
     return jsonify({
-        'datasets': [dataset.to_dict() for dataset in datasets.items],
+        'datasets': datasets_list,
         'total': datasets.total,
         'pages': datasets.pages,
         'current_page': page
     })
+
+
+@datasets_bp.route('/datasets/stats', methods=['GET'])
+def get_datasets_stats():
+    """Get datasets summary stats"""
+    try:
+        total_datasets = Dataset.query.count()
+        total_classes = db.session.query(func.count(Class.id)).scalar() or 0
+        total_files = db.session.query(func.count(DatasetFile.id)).scalar() or 0
+
+        return jsonify({
+            'success': True,
+            'stats': {
+                'total_datasets': total_datasets,
+                'total_classes': total_classes,
+                'total_files': total_files
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @datasets_bp.route('/datasets/<int:dataset_id>', methods=['GET'])
@@ -87,31 +166,23 @@ def create_dataset():
         
         # Process uploaded files
         uploaded_files = []
-        print(f"DEBUG: Processing files for dataset {name}")
-        print(f"DEBUG: request.files keys: {list(request.files.keys())}")
-        
         for split in ['train', 'val', 'test']:
             # Process images (multiple files)
             images_key = f'{split}_images'
-            print(f"DEBUG: Looking for {images_key}")
             if images_key in request.files:
                 files = request.files.getlist(images_key)
-                print(f"DEBUG: Found {len(files)} files for {images_key}")
                 for file in files:
                     if file.filename:
-                        print(f"DEBUG: Processing image file: {file.filename}")
                         filename = secure_filename(file.filename)
                         images_dir = os.path.join(dataset_path, 'images', split)
                         os.makedirs(images_dir, exist_ok=True)
                         
                         file_path = os.path.join(images_dir, filename)
                         file.save(file_path)
-                        print(f"DEBUG: Saved image to: {file_path}")
                         
                         # Validate image
                         if storage.validate_image(file_path):
                             uploaded_files.append(file_path)
-                            print(f"DEBUG: Image validation passed: {file_path}")
                             # Record in database
                             dataset_file = DatasetFile(
                                 dataset_id=dataset.id,
@@ -120,34 +191,24 @@ def create_dataset():
                             )
                             db.session.add(dataset_file)
                         else:
-                            print(f"DEBUG: Image validation failed, removing: {file_path}")
                             os.remove(file_path)  # Remove invalid files
-                    else:
-                        print(f"DEBUG: Empty filename for {images_key}")
-            else:
-                print(f"DEBUG: No files found for {images_key}")
             
             # Process labels (multiple files)
             labels_key = f'{split}_labels'
-            print(f"DEBUG: Looking for {labels_key}")
             if labels_key in request.files:
                 files = request.files.getlist(labels_key)
-                print(f"DEBUG: Found {len(files)} files for {labels_key}")
                 for file in files:
                     if file.filename:
-                        print(f"DEBUG: Processing label file: {file.filename}")
                         filename = secure_filename(file.filename)
                         labels_dir = os.path.join(dataset_path, 'labels', split)
                         os.makedirs(labels_dir, exist_ok=True)
                         
                         file_path = os.path.join(labels_dir, filename)
                         file.save(file_path)
-                        print(f"DEBUG: Saved label to: {file_path}")
                         
                         # Validate label
                         if storage.validate_yolo_label(file_path, len(classes)):
                             uploaded_files.append(file_path)
-                            print(f"DEBUG: Label validation passed: {file_path}")
                             # Record in database
                             dataset_file = DatasetFile(
                                 dataset_id=dataset.id,
@@ -156,14 +217,7 @@ def create_dataset():
                             )
                             db.session.add(dataset_file)
                         else:
-                            print(f"DEBUG: Label validation failed, removing: {file_path}")
                             os.remove(file_path)  # Remove invalid files
-                    else:
-                        print(f"DEBUG: Empty filename for {labels_key}")
-            else:
-                print(f"DEBUG: No files found for {labels_key}")
-        
-        print(f"DEBUG: Total uploaded files: {len(uploaded_files)}")
         
         # Generate YAML file
         yaml_file = storage.generate_dataset_yaml(dataset_path, name, classes)

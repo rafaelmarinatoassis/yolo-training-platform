@@ -57,12 +57,6 @@ def get_test(test_id):
     return jsonify(test_dict)
 
 
-@tests_bp.route('/api/tests/<int:test_id>', methods=['GET'])
-def get_test_api(test_id):
-    """Get test details via API"""
-    return get_test(test_id)
-
-
 @tests_bp.route('/tests', methods=['POST'])
 def create_test():
     """Create a new test/inference job"""
@@ -282,12 +276,6 @@ def get_test_results(test_id):
                 })
     
     return jsonify(results)
-
-
-@tests_bp.route('/api/tests/<int:test_id>/results', methods=['GET'])
-def get_test_results_api(test_id):
-    """Get test results via API"""
-    return get_test_results(test_id)
 
 
 @tests_bp.route('/tests/<int:test_id>', methods=['DELETE'])

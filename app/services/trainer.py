@@ -37,6 +37,8 @@ class TrainingService:
         app = create_app()
         with app.app_context():
             training = None
+            torch = None
+            original_torch_load = None
             try:
                 # Get training record
                 training = Training.query.get(training_id)
@@ -63,9 +65,13 @@ class TrainingService:
                 if not os.path.exists(dataset_path):
                     raise FileNotFoundError(f"Dataset YAML not found: {dataset_path}")
 
-                # Configure YOLO model based on task type and version
-                task_suffix = '' if training.task_type == 'detect' else f'-{training.task_type}'
-                model_name = f"yolov8{training.model_version}{task_suffix}.pt"
+                # Resolve model name from persisted config first (MVP-friendly, no DB migration needed).
+                train_config = training.get_config() or {}
+                if train_config.get('model_name'):
+                    model_name = train_config['model_name']
+                else:
+                    task_suffix = '' if training.task_type == 'detect' else f'-{training.task_type}'
+                    model_name = f"yolov8{training.model_version}{task_suffix}.pt"
                 
                 # Temporary workaround for PyTorch 2.6 weights_only issue
                 import torch
@@ -105,14 +111,47 @@ class TrainingService:
                     'message': f'Dataset: {training.dataset.name} | Épocas: {training.epochs} | Tamanho da imagem: {training.img_size}px'
                 }, namespace='/ws/trainings')
                 
-                # Configure device based on selection
-                device_config = training.device
-                if device_config == 'auto':
-                    # Let YOLO choose best available device
-                    device_config = None
-                elif device_config == 'cuda':
-                    device_config = 0  # Use first GPU
-                # For 'cpu' or 'mps', use the string as-is
+                # Configure device based on selection with graceful fallback across vendors.
+                def resolve_device(selected_device):
+                    selected = (selected_device or 'auto').lower()
+
+                    has_cuda = bool(torch.cuda.is_available())
+                    has_mps = bool(
+                        hasattr(torch.backends, 'mps')
+                        and torch.backends.mps.is_available()
+                    )
+                    has_xpu = bool(
+                        hasattr(torch, 'xpu')
+                        and hasattr(torch.xpu, 'is_available')
+                        and torch.xpu.is_available()
+                    )
+
+                    if selected == 'auto':
+                        if has_cuda:
+                            return 0
+                        if has_xpu:
+                            return 'xpu'
+                        if has_mps:
+                            return 'mps'
+                        return 'cpu'
+
+                    if selected == 'cuda':
+                        # NVIDIA CUDA and AMD ROCm commonly expose cuda backend in PyTorch.
+                        return 0 if has_cuda else 'cpu'
+
+                    if selected == 'xpu':
+                        return 'xpu' if has_xpu else 'cpu'
+
+                    if selected == 'mps':
+                        return 'mps' if has_mps else 'cpu'
+
+                    if selected == 'cpu':
+                        return 'cpu'
+
+                    # Unknown value: keep resilient behavior.
+                    return 'cpu'
+
+                device_config = resolve_device(training.device)
                 
                 # Training arguments using specific fields
                 train_args = {
@@ -130,9 +169,7 @@ class TrainingService:
                     'exist_ok': True
                 }
                 
-                # Add device only if specified
-                if device_config is not None:
-                    train_args['device'] = device_config
+                train_args['device'] = device_config
                 
                 # Custom callback for tracking progress
                 def on_train_epoch_end(trainer):
@@ -165,7 +202,20 @@ class TrainingService:
                             'loss': metric.loss,
                             'accuracy': metric.accuracy,
                             'val_loss': metric.val_loss,
-                            'val_accuracy': metric.val_accuracy
+                            'val_accuracy': metric.val_accuracy,
+                            'map50': metric.map50,
+                            'map5095': metric.map
+                        }, namespace='/ws/trainings')
+
+                        # Backward compatibility for dashboards that still listen to training_update
+                        socketio.emit('training_update', {
+                            'training_id': training_id,
+                            'epoch': epoch,
+                            'total_epochs': training.epochs,
+                            'loss': metric.loss,
+                            'map50': metric.map50,
+                            'precision': metric.val_accuracy,
+                            'recall': metric.accuracy
                         }, namespace='/ws/trainings')
                         
                         # Emit detailed training log
@@ -249,7 +299,8 @@ class TrainingService:
                 
             finally:
                 # Restore original torch.load after training completes
-                torch.load = original_torch_load
+                if torch is not None and original_torch_load is not None:
+                    torch.load = original_torch_load
                 
                 # Clean up
                 if training_id in self.active_trainings:
@@ -279,7 +330,7 @@ class TrainingService:
     
     def _calculate_progress(self, training):
         """Calculate training progress percentage"""
-        if training.status in ['pending', 'failed']:
+        if training.status in ['queued', 'failed']:
             return 0
         elif training.status == 'completed':
             return 100

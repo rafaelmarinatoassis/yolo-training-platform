@@ -108,6 +108,10 @@ class Training(db.Model):
         self.config_json = json.dumps(config_dict)
     
     def to_dict(self):
+        config = self.get_config()
+        task_suffix = '' if self.task_type == 'detect' else f'-{self.task_type}'
+        resolved_model_name = config.get('model_name', f"yolov8{self.model_version}{task_suffix}.pt")
+
         return {
             'id': self.id,
             'dataset_id': self.dataset_id,
@@ -115,6 +119,7 @@ class Training(db.Model):
             
             # Model configuration
             'model_version': self.model_version,
+            'model_name': resolved_model_name,
             'task_type': self.task_type,
             'device': self.device,
             
@@ -129,7 +134,7 @@ class Training(db.Model):
             'use_augmentation': self.use_augmentation,
             
             # Legacy config for backward compatibility
-            'config': self.get_config(),
+            'config': config,
             
             # Status and paths
             'status': self.status,
