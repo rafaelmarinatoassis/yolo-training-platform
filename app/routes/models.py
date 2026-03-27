@@ -1,4 +1,4 @@
-import os
+﻿import os
 import shutil
 from urllib.parse import urlparse
 
@@ -72,7 +72,7 @@ def check_model():
             'exists': True,
             'local_path': os.path.abspath(model_name),
             'downloadable': True,
-            'message': 'Modelo já existe localmente.'
+            'message': 'Modelo ja existe localmente.'
         })
 
     target_path = _build_model_path(model_name)
@@ -81,7 +81,7 @@ def check_model():
             'exists': True,
             'local_path': os.path.abspath(target_path),
             'downloadable': True,
-            'message': 'Modelo disponível no cache local.'
+            'message': 'Modelo disponivel no cache local.'
         })
 
     downloadable = bool(model_url) or model_name.lower() in ULTRALYTICS_KNOWN_MODELS
@@ -90,9 +90,9 @@ def check_model():
         'downloadable': downloadable,
         'local_path': os.path.abspath(target_path),
         'message': (
-            'Modelo não encontrado localmente.'
+            'Modelo nao encontrado localmente.'
             if downloadable
-            else 'Modelo não encontrado localmente e não está na lista de pesos oficiais desta versão.'
+            else 'Modelo nao encontrado localmente e nao esta na lista de pesos oficiais desta versao.'
         )
     })
 
@@ -113,7 +113,7 @@ def download_model():
             'downloaded': False,
             'model_name': os.path.basename(model_name),
             'local_path': os.path.abspath(model_name),
-            'message': 'Modelo local já disponível.'
+            'message': 'Modelo local ja disponivel.'
         })
 
     target_path = _build_model_path(model_name)
@@ -123,7 +123,7 @@ def download_model():
             'downloaded': False,
             'model_name': os.path.basename(target_path),
             'local_path': os.path.abspath(target_path),
-            'message': 'Modelo já estava no cache.'
+            'message': 'Modelo j estava no cache.'
         })
 
     try:
@@ -144,7 +144,7 @@ def download_model():
             if not downloaded_path or not os.path.exists(downloaded_path):
                 return jsonify({
                     'error': (
-                        'Modelo não encontrado no repositório da versão instalada do Ultralytics. '
+                        'Modelo nao encontrado no repositorio da versao instalada do Ultralytics. '
                         'Use um modelo YOLOv8 oficial (ex.: yolov8n.pt) ou informe model_url.'
                     )
                 }), 400
@@ -158,10 +158,11 @@ def download_model():
             'downloaded': True,
             'model_name': os.path.basename(target_path),
             'local_path': os.path.abspath(target_path),
-            'message': 'Download concluído com sucesso.'
+            'message': 'Download concluido com sucesso.'
         })
 
     except requests.RequestException as e:
         return jsonify({'error': f'Falha no download HTTP: {str(e)}'}), 500
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+

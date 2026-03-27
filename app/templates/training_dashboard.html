@@ -4,269 +4,269 @@
 
 {% block content %}
 <div class="container-fluid">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2><i class="bi bi-graph-up"></i> Dashboard - Training {{ training.id }}</h2>
-                <div>
-                    <a href="/training/{{ training_id }}/details" class="btn btn-outline-secondary me-2">
-                        <i class="bi bi-arrow-left"></i> Voltar
-                    </a>
-                    <span class="badge {{ 'bg-success' if training.status == 'completed' else 'bg-warning' if training.status == 'running' else 'bg-info' }} fs-6">
-                        {{ training.status.title() }}
-                    </span>
-                </div>
-            </div>
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2><i class="bi bi-graph-up"></i> Dashboard - Training {{ training.id }}</h2>
+        <div>
+          <a href="/training/{{ training_id }}/details" class="btn btn-outline-secondary me-2">
+            <i class="bi bi-arrow-left"></i> Voltar
+          </a>
+          <span class="badge {{ 'bg-success' if training.status == 'completed' else 'bg-warning' if training.status == 'running' else 'bg-info' }} fs-6">
+            {{ training.status.title() }}
+          </span>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Progress Bar -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Progresso do Treinamento</h5>
-                    <div class="progress mb-3" style="height: 25px;">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                             role="progressbar" 
-                             style="width: {{ progress }}%"
-                             aria-valuenow="{{ progress }}" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100">
-                            {{ progress }}%
-                        </div>
-                    </div>
-                    <div class="row text-center">
-                        <div class="col-md-3">
-                            <strong>Ã‰poca Atual</strong><br>
-                            <span class="fs-3 text-primary">{{ current_epoch }}</span> / {{ training.epochs }}
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Tempo Decorrido</strong><br>
-                            <span class="fs-3 text-info">{{ elapsed_time }}</span>
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Tempo Estimado</strong><br>
-                            <span class="fs-3 text-warning">{{ estimated_time }}</span>
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Velocidade</strong><br>
-                            <span class="fs-3 text-success">{{ processing_speed }}</span>
-                        </div>
-                    </div>
-                </div>
+  <!-- Progress Bar -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Progresso do Treinamento</h5>
+          <div class="progress mb-3" style="height: 25px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+               role="progressbar" 
+               style="width: {{ progress }}%"
+               aria-valuenow="{{ progress }}" 
+               aria-valuemin="0" 
+               aria-valuemax="100">
+              {{ progress }}%
             </div>
+          </div>
+          <div class="row text-center">
+            <div class="col-md-3">
+              <strong>Epoca Atual</strong><br>
+              <span class="fs-3 text-primary">{{ current_epoch }}</span> / {{ training.epochs }}
+            </div>
+            <div class="col-md-3">
+              <strong>Tempo Decorrido</strong><br>
+              <span class="fs-3 text-info">{{ elapsed_time }}</span>
+            </div>
+            <div class="col-md-3">
+              <strong>Tempo Estimado</strong><br>
+              <span class="fs-3 text-warning">{{ estimated_time }}</span>
+            </div>
+            <div class="col-md-3">
+              <strong>Velocidade</strong><br>
+              <span class="fs-3 text-success">{{ processing_speed }}</span>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- MÃ©tricas em Tempo Real -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="bi bi-bar-chart-line"></i> MÃ©tricas em Tempo Real
-                        <span class="badge bg-success ms-2" id="liveIndicator">LIVE</span>
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row" id="metricsContainer">
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="card bg-danger text-white">
-                                <div class="card-body text-center">
-                                    <h6>Training Loss</h6>
-                                    <h2 id="currentLoss">-</h2>
-                                    <small>Ãšltima atualizaÃ§Ã£o: <span id="lossTime">-</span></small>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="card bg-success text-white">
-                                <div class="card-body text-center">
-                                    <h6>mAP50 (%)</h6>
-                                    <h2 id="currentMap50">-</h2>
-                                    <small>Ãšltima atualizaÃ§Ã£o: <span id="map50Time">-</span></small>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="card bg-info text-white">
-                                <div class="card-body text-center">
-                                    <h6>PrecisÃ£o (%)</h6>
-                                    <h2 id="currentPrecision">-</h2>
-                                    <small>Ãšltima atualizaÃ§Ã£o: <span id="precisionTime">-</span></small>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="card bg-warning text-white">
-                                <div class="card-body text-center">
-                                    <h6>Recall (%)</h6>
-                                    <h2 id="currentRecall">-</h2>
-                                    <small>Ãšltima atualizaÃ§Ã£o: <span id="recallTime">-</span></small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <!-- Metricas em Tempo Real -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-bar-chart-line"></i> Metricas em Tempo Real
+            <span class="badge bg-success ms-2" id="liveIndicator">LIVE</span>
+          </h5>
         </div>
+        <div class="card-body">
+          <div class="row" id="metricsContainer">
+            <div class="col-lg-3 col-md-6 mb-3">
+              <div class="card bg-danger text-white">
+                <div class="card-body text-center">
+                  <h6>Training Loss</h6>
+                  <h2 id="currentLoss">-</h2>
+                  <small>Ultima atualizacao: <span id="lossTime">-</span></small>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-3">
+              <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                  <h6>mAP50 (%)</h6>
+                  <h2 id="currentMap50">-</h2>
+                  <small>Ultima atualizacao: <span id="map50Time">-</span></small>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-3">
+              <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                  <h6>Precisao (%)</h6>
+                  <h2 id="currentPrecision">-</h2>
+                  <small>Ultima atualizacao: <span id="precisionTime">-</span></small>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-3">
+              <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                  <h6>Recall (%)</h6>
+                  <h2 id="currentRecall">-</h2>
+                  <small>Ultima atualizacao: <span id="recallTime">-</span></small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- ExplicaÃ§Ã£o das MÃ©tricas -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-info-circle"></i> Como Interpretar as MÃ©tricas
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-6 col-md-12 mb-3">
-                            <h6 class="text-danger"><i class="bi bi-graph-up"></i> Training Loss (Erro)</h6>
-                            <p class="mb-2"><strong>O que Ã©:</strong> Mede o quanto o modelo estÃ¡ "errando" durante o treinamento.</p>
-                            <p class="mb-2"><strong>Como ler:</strong></p>
-                            <ul class="mb-2">
-                                <li><span class="badge bg-success">Diminuindo</span> = Modelo estÃ¡ aprendendo âœ…</li>
-                                <li><span class="badge bg-warning">EstÃ¡vel</span> = Modelo pode ter convergido</li>
-                                <li><span class="badge bg-danger">Aumentando</span> = PossÃ­vel overfitting âš ï¸</li>
-                            </ul>
-                            <small class="text-muted"><strong>Meta:</strong> Valores menores sÃ£o melhores (idealmente < 1.0)</small>
-                        </div>
-                        
-                        <div class="col-lg-6 col-md-12 mb-3">
-                            <h6 class="text-success"><i class="bi bi-bullseye"></i> mAP50 (PrecisÃ£o Principal)</h6>
-                            <p class="mb-2"><strong>O que Ã©:</strong> Mede a precisÃ£o geral do modelo para detectar objetos.</p>
-                            <p class="mb-2"><strong>Como ler:</strong></p>
-                            <ul class="mb-2">
-                                <li><span class="badge bg-success">> 50%</span> = Modelo muito bom âœ…</li>
-                                <li><span class="badge bg-warning">30-50%</span> = Modelo razoÃ¡vel ðŸ‘</li>
-                                <li><span class="badge bg-danger">< 30%</span> = Precisa melhorar ðŸ“ˆ</li>
-                            </ul>
-                            <small class="text-muted"><strong>Meta:</strong> Valores maiores sÃ£o melhores (mÃ¡ximo 100%)</small>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-lg-6 col-md-12 mb-3">
-                            <h6 class="text-info"><i class="bi bi-crosshair"></i> PrecisÃ£o (%)</h6>
-                            <p class="mb-2"><strong>O que Ã©:</strong> Dos objetos que o modelo detectou, quantos estavam corretos?</p>
-                            <p class="mb-2"><strong>Como ler:</strong></p>
-                            <ul class="mb-2">
-                                <li><span class="badge bg-success">Alta precisÃ£o</span> = Poucas detecÃ§Ãµes falsas âœ…</li>
-                                <li><span class="badge bg-warning">Baixa precisÃ£o</span> = Muitos falsos positivos âš ï¸</li>
-                            </ul>
-                            <small class="text-muted"><strong>Exemplo:</strong> 80% = de 100 detecÃ§Ãµes, 80 estavam certas</small>
-                        </div>
-                        
-                        <div class="col-lg-6 col-md-12 mb-3">
-                            <h6 class="text-warning"><i class="bi bi-search"></i> Recall (Sensibilidade)</h6>
-                            <p class="mb-2"><strong>O que Ã©:</strong> Dos objetos que existiam na imagem, quantos o modelo conseguiu encontrar?</p>
-                            <p class="mb-2"><strong>Como ler:</strong></p>
-                            <ul class="mb-2">
-                                <li><span class="badge bg-success">Alto recall</span> = Encontra quase tudo âœ…</li>
-                                <li><span class="badge bg-warning">Baixo recall</span> = Perde muitos objetos âš ï¸</li>
-                            </ul>
-                            <small class="text-muted"><strong>Exemplo:</strong> 70% = de 100 objetos reais, encontrou 70</small>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="alert alert-light">
-                                <h6><i class="bi bi-lightbulb text-warning"></i> Dica de InterpretaÃ§Ã£o:</h6>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <strong>ðŸŽ¯ Modelo Ideal:</strong><br>
-                                        <small>Loss baixo, mAP50 alto, PrecisÃ£o e Recall equilibrados</small>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <strong>âš–ï¸ Trade-off:</strong><br>
-                                        <small>Ã€s vezes precisÃ£o alta = recall baixo e vice-versa</small>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <strong>ðŸ“ˆ Progresso:</strong><br>
-                                        <small>Observe as tendÃªncias ao longo das Ã©pocas</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <!-- Explicacao das Metricas -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-info-circle"></i> Como Interpretar as Metricas
+          </h5>
         </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-lg-6 col-md-12 mb-3">
+              <h6 class="text-danger"><i class="bi bi-graph-up"></i> Training Loss (Erro)</h6>
+              <p class="mb-2"><strong>O que e:</strong> Mede o quanto o modelo esta errando durante o treinamento.</p>
+              <p class="mb-2"><strong>Como ler:</strong></p>
+              <ul class="mb-2">
+                <li><span class="badge bg-success">Diminuindo</span> = Modelo esta aprendendo</li>
+                <li><span class="badge bg-warning">Estavel</span> = Modelo pode ter convergido</li>
+                <li><span class="badge bg-danger">Aumentando</span> = Possivel overfitting</li>
+              </ul>
+              <small class="text-muted"><strong>Meta:</strong> Valores menores sao melhores (idealmente menor que 1.0)</small>
+            </div>
+            
+            <div class="col-lg-6 col-md-12 mb-3">
+              <h6 class="text-success"><i class="bi bi-bullseye"></i> mAP50 (Precisao Principal)</h6>
+              <p class="mb-2"><strong>O que e:</strong> Mede a precisao geral do modelo para detectar objetos.</p>
+              <p class="mb-2"><strong>Como ler:</strong></p>
+              <ul class="mb-2">
+                <li><span class="badge bg-success">> 50%</span> = Modelo muito bom </li>
+                <li><span class="badge bg-warning">30-50%</span> = Modelo razoavel </li>
+                <li><span class="badge bg-danger">< 30%</span> = Precisa melhorar </li>
+              </ul>
+              <small class="text-muted"><strong>Meta:</strong> Valores maiores sao melhores (maximo 100%)</small>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-lg-6 col-md-12 mb-3">
+              <h6 class="text-info"><i class="bi bi-crosshair"></i> Precisao (%)</h6>
+              <p class="mb-2"><strong>O que e:</strong> Dos objetos que o modelo detectou, quantos estavam corretos?</p>
+              <p class="mb-2"><strong>Como ler:</strong></p>
+              <ul class="mb-2">
+                <li><span class="badge bg-success">Alta precisao</span> = Poucas deteccoes falsas</li>
+                <li><span class="badge bg-warning">Baixa precisao</span> = Muitos falsos positivos</li>
+              </ul>
+              <small class="text-muted"><strong>Exemplo:</strong> 80% = de 100 deteccoes, 80 estavam corretas</small>
+            </div>
+            
+            <div class="col-lg-6 col-md-12 mb-3">
+              <h6 class="text-warning"><i class="bi bi-search"></i> Recall (Sensibilidade)</h6>
+              <p class="mb-2"><strong>O que e:</strong> Dos objetos que existiam na imagem, quantos o modelo conseguiu encontrar?</p>
+              <p class="mb-2"><strong>Como ler:</strong></p>
+              <ul class="mb-2">
+                <li><span class="badge bg-success">Alto recall</span> = Encontra quase tudo </li>
+                <li><span class="badge bg-warning">Baixo recall</span> = Perde muitos objetos </li>
+              </ul>
+              <small class="text-muted"><strong>Exemplo:</strong> 70% = de 100 objetos reais, encontrou 70</small>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-12">
+              <div class="alert alert-light">
+                <h6><i class="bi bi-lightbulb text-warning"></i> Dica de Interpretacao:</h6>
+                <div class="row">
+                  <div class="col-md-4">
+                    <strong> Modelo Ideal:</strong><br>
+                    <small>Loss baixo, mAP50 alto, Precisao e Recall equilibrados</small>
+                  </div>
+                  <div class="col-md-4">
+                    <strong> Trade-off:</strong><br>
+                    <small>As vezes precisao alta = recall baixo e vice-versa</small>
+                  </div>
+                  <div class="col-md-4">
+                    <strong> Progresso:</strong><br>
+                    <small>Observe as tendencias ao longo das epocas</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- InformaÃ§Ãµes do Modelo -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="bi bi-gear"></i> ConfiguraÃ§Ã£o do Modelo</h5>
-                </div>
-                <div class="card-body">
-                    <table class="table table-borderless">
-                        <tr>
-                            <td><strong>Nome:</strong></td>
-                            <td>{{ training.get_config().get('model_name', 'yolov8' ~ training.model_version ~ ('' if training.task_type == 'detect' else '-' ~ training.task_type) ~ '.pt') }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Dataset:</strong></td>
-                            <td>{{ training.dataset.name if training.dataset else 'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Ã‰pocas Totais:</strong></td>
-                            <td>{{ training.epochs }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Tamanho da Imagem:</strong></td>
-                            <td>{{ training.img_size }}px</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Batch Size:</strong></td>
-                            <td>{{ training.batch_size }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Iniciado em:</strong></td>
-                            <td>{{ training.started_at.strftime('%d/%m/%Y %H:%M:%S') if training.started_at else 'N/A' }}</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
+  <!-- Informacoes do Modelo -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5><i class="bi bi-gear"></i> Configuracao do Modelo</h5>
         </div>
-        
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="bi bi-clock-history"></i> HistÃ³rico de MÃ©tricas</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                        <table class="table table-sm table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Ã‰poca</th>
-                                    <th>Loss</th>
-                                    <th>mAP50</th>
-                                    <th>PrecisÃ£o</th>
-                                    <th>Recall</th>
-                                </tr>
-                            </thead>
-                            <tbody id="metricsHistory">
-                                <!-- SerÃ¡ preenchido via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+        <div class="card-body">
+          <table class="table table-borderless">
+            <tr>
+              <td><strong>Nome:</strong></td>
+              <td>{{ training.get_config().get('model_name', 'yolov8' ~ training.model_version ~ ('' if training.task_type == 'detect' else '-' ~ training.task_type) ~ '.pt') }}</td>
+            </tr>
+            <tr>
+              <td><strong>Dataset:</strong></td>
+              <td>{{ training.dataset.name if training.dataset else 'N/A' }}</td>
+            </tr>
+            <tr>
+              <td><strong>Epocas Totais:</strong></td>
+              <td>{{ training.epochs }}</td>
+            </tr>
+            <tr>
+              <td><strong>Tamanho da Imagem:</strong></td>
+              <td>{{ training.img_size }}px</td>
+            </tr>
+            <tr>
+              <td><strong>Batch Size:</strong></td>
+              <td>{{ training.batch_size }}</td>
+            </tr>
+            <tr>
+              <td><strong>Iniciado em:</strong></td>
+              <td>{{ training.started_at.strftime('%d/%m/%Y %H:%M:%S') if training.started_at else 'N/A' }}</td>
+            </tr>
+          </table>
         </div>
+      </div>
     </div>
+    
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5><i class="bi bi-clock-history"></i> Historico de Metricas</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+            <table class="table table-sm table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th>Epoca</th>
+                  <th>Loss</th>
+                  <th>mAP50</th>
+                  <th>Precisao</th>
+                  <th>Recall</th>
+                </tr>
+              </thead>
+              <tbody id="metricsHistory">
+                <!-- Ser preenchido via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -288,122 +288,123 @@ const metricsHistory = document.getElementById('metricsHistory');
 // Conectar ao WebSocket
 const socket = io();
 
-// Atualizar indicador de conexÃ£o
+// Atualizar indicador de conexao
 socket.on('connect', function() {
-    console.log('Conectado ao WebSocket');
-    liveIndicator.className = 'badge bg-success ms-2';
-    liveIndicator.textContent = 'LIVE';
+  console.log('Conectado ao WebSocket');
+  liveIndicator.className = 'badge bg-success ms-2';
+  liveIndicator.textContent = 'LIVE';
 });
 
 socket.on('disconnect', function() {
-    console.log('Desconectado do WebSocket');
-    liveIndicator.className = 'badge bg-danger ms-2';
-    liveIndicator.textContent = 'OFFLINE';
+  console.log('Desconectado do WebSocket');
+  liveIndicator.className = 'badge bg-danger ms-2';
+  liveIndicator.textContent = 'OFFLINE';
 });
 
-// Escutar atualizaÃ§Ãµes de mÃ©tricas
+// Escutar atualizacoes de metricas
 socket.on('training_update', function(data) {
-    if (data.training_id === trainingId) {
-        updateMetrics(data);
-        addToHistory(data);
-    }
+  if (data.training_id === trainingId) {
+    updateMetrics(data);
+    addToHistory(data);
+  }
 });
 
-// FunÃ§Ã£o para atualizar mÃ©tricas em tempo real
+// Funcao para atualizar metricas em tempo real
 function updateMetrics(data) {
-    const now = new Date().toLocaleTimeString();
-    
-    if (data.loss !== undefined) {
-        currentLoss.textContent = data.loss.toFixed(4);
-        lossTime.textContent = now;
-    }
-    
-    if (data.map50 !== undefined) {
-        currentMap50.textContent = (data.map50 * 100).toFixed(2);
-        map50Time.textContent = now;
-    }
-    
-    if (data.precision !== undefined) {
-        currentPrecision.textContent = (data.precision * 100).toFixed(2);
-        precisionTime.textContent = now;
-    }
-    
-    if (data.recall !== undefined) {
-        currentRecall.textContent = (data.recall * 100).toFixed(2);
-        recallTime.textContent = now;
-    }
-    
-    // Piscar indicador LIVE
-    liveIndicator.style.animation = 'none';
-    setTimeout(() => {
-        liveIndicator.style.animation = 'pulse 2s infinite';
-    }, 100);
+  const now = new Date().toLocaleTimeString();
+  
+  if (data.loss !== undefined) {
+    currentLoss.textContent = data.loss.toFixed(4);
+    lossTime.textContent = now;
+  }
+  
+  if (data.map50 !== undefined) {
+    currentMap50.textContent = (data.map50 * 100).toFixed(2);
+    map50Time.textContent = now;
+  }
+  
+  if (data.precision !== undefined) {
+    currentPrecision.textContent = (data.precision * 100).toFixed(2);
+    precisionTime.textContent = now;
+  }
+  
+  if (data.recall !== undefined) {
+    currentRecall.textContent = (data.recall * 100).toFixed(2);
+    recallTime.textContent = now;
+  }
+  
+  // Piscar indicador LIVE
+  liveIndicator.style.animation = 'none';
+  setTimeout(() => {
+    liveIndicator.style.animation = 'pulse 2s infinite';
+  }, 100);
 }
 
-// FunÃ§Ã£o para adicionar ao histÃ³rico
+// Funcao para adicionar ao historico
 function addToHistory(data) {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td>${data.epoch || '-'}</td>
-        <td>${data.loss ? data.loss.toFixed(4) : '-'}</td>
-        <td>${data.map50 ? (data.map50 * 100).toFixed(2) + '%' : '-'}</td>
-        <td>${data.precision ? (data.precision * 100).toFixed(2) + '%' : '-'}</td>
-        <td>${data.recall ? (data.recall * 100).toFixed(2) + '%' : '-'}</td>
-    `;
-    
-    // Adicionar no topo da tabela
-    metricsHistory.insertBefore(row, metricsHistory.firstChild);
-    
-    // Manter apenas as Ãºltimas 10 linhas
-    while (metricsHistory.children.length > 10) {
-        metricsHistory.removeChild(metricsHistory.lastChild);
-    }
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td>${data.epoch || '-'}</td>
+    <td>${data.loss !== undefined ? data.loss.toFixed(4) : '-'}</td>
+    <td>${data.map50 !== undefined ? (data.map50 * 100).toFixed(2) + '%' : '-'}</td>
+    <td>${data.precision !== undefined ? (data.precision * 100).toFixed(2) + '%' : '-'}</td>
+    <td>${data.recall !== undefined ? (data.recall * 100).toFixed(2) + '%' : '-'}</td>
+  `;
+  
+  // Adicionar no topo da tabela
+  metricsHistory.insertBefore(row, metricsHistory.firstChild);
+  
+  // Manter apenas as ultimas 10 linhas
+  while (metricsHistory.children.length > 10) {
+    metricsHistory.removeChild(metricsHistory.lastChild);
+  }
 }
 
 // Carregar dados iniciais do CSV
 function loadInitialData() {
-    fetch(`/api/trainings/${trainingId}/csv-data`)
-        .then(response => response.json())
-        .then(data => {
-            console.log('Dados iniciais carregados:', data);
-            
-            if (data.metrics && data.metrics.length > 0) {
-                // Pegar a Ãºltima mÃ©trica
-                const latest = data.metrics[data.metrics.length - 1];
-                console.log('Latest metrics:', latest);
-                console.log('Precision:', latest.precision, 'Recall:', latest.recall);
-                updateMetrics(latest);
-                
-                // Preencher histÃ³rico (Ãºltimas 10)
-                const recentMetrics = data.metrics.slice(-10).reverse();
-                metricsHistory.innerHTML = '';
-                recentMetrics.forEach(metric => {
-                    addToHistory(metric);
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Erro ao carregar dados:', error);
+  fetch(`/api/trainings/${trainingId}/csv-data`)
+    .then(response => response.json())
+    .then(data => {
+      console.log('Dados iniciais carregados:', data);
+      
+      if (data.metrics && data.metrics.length > 0) {
+        // Pegar a ultima metrica
+        const latest = data.metrics[data.metrics.length - 1];
+        console.log('Latest metrics:', latest);
+        console.log('Precision:', latest.precision, 'Recall:', latest.recall);
+        updateMetrics(latest);
+        
+        // Preencher historico (ultimas 10)
+        const recentMetrics = data.metrics.slice(-10).reverse();
+        metricsHistory.innerHTML = '';
+        recentMetrics.forEach(metric => {
+          addToHistory(metric);
         });
+      }
+    })
+    .catch(error => {
+      console.error('Erro ao carregar dados:', error);
+    });
 }
 
 // Inicializar dashboard
 document.addEventListener('DOMContentLoaded', function() {
-    loadInitialData();
-    
-    // Adicionar animaÃ§Ã£o CSS para o indicador LIVE
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-    `;
-    document.head.appendChild(style);
-    
-    console.log('Dashboard inicializado para training ID:', trainingId);
+  loadInitialData();
+  
+  // Adicionar animacao CSS para o indicador LIVE
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  console.log('Dashboard inicializado para training ID:', trainingId);
 });
 </script>
 {% endblock %}
+
 

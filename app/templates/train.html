@@ -4,459 +4,518 @@
 
 {% block content %}
 <div class="container-fluid">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-primary">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h1 class="text-primary mb-2">
-                                <i class="bi bi-play-circle"></i>
-                                Treinar Modelo de IA
-                            </h1>
-                            <p class="text-muted mb-0">
-                                <i class="bi bi-info-circle"></i>
-                                Configure e inicie o treinamento de um modelo personalizado para detectar seus objetos
-                            </p>
-                        </div>
-                        <div class="col-md-4 text-end">
-                            <div class="badge bg-success fs-6 p-2">
-                                <i class="bi bi-check-circle"></i>
-                                Sistema Pronto
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-primary">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <h1 class="text-primary mb-2">
+                <i class="bi bi-play-circle"></i>
+                Treinar Modelo de IA
+              </h1>
+              <p class="text-muted mb-0">
+                <i class="bi bi-info-circle"></i>
+                Configure e inicie o treinamento de um modelo personalizado para detectar seus objetos
+              </p>
             </div>
+            <div class="col-md-4 text-end">
+              <div class="badge bg-success fs-6 p-2">
+                <i class="bi bi-check-circle"></i>
+                Sistema Pronto
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Card -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card bg-primary bg-opacity-10 border-primary">
+        <div class="card-body">
+          <h5 class="card-title text-primary">
+            <i class="bi bi-lightbulb"></i>
+            Como funciona o treinamento
+          </h5>
+          <p class="card-text mb-3">
+            O treinamento e o processo onde a inteligencia artificial aprende a reconhecer objetos usando seu dataset.
+            Como ensinar uma crianca: voce mostra exemplos e a IA aprende os padroes.
+          </p>
+          <div class="row">
+            <div class="col-md-3 text-center">
+              <div class="p-3">
+                <i class="bi bi-1-circle-fill fs-2 text-primary"></i>
+                <h6 class="mt-2">Selecionar Dataset</h6>
+                <small class="text-muted">Escolha as imagens que a IA vai aprender</small>
+              </div>
+            </div>
+            <div class="col-md-3 text-center">
+              <div class="p-3">
+                <i class="bi bi-2-circle-fill fs-2 text-primary"></i>
+                <h6 class="mt-2">Configurar Modelo</h6>
+                <small class="text-muted">Defina o tipo e precisao do modelo</small>
+              </div>
+            </div>
+            <div class="col-md-3 text-center">
+              <div class="p-3">
+                <i class="bi bi-3-circle-fill fs-2 text-primary"></i>
+                <h6 class="mt-2">Aguardar Treino</h6>
+                <small class="text-muted">A IA processa e aprende sozinha</small>
+              </div>
+            </div>
+            <div class="col-md-3 text-center">
+              <div class="p-3">
+                <i class="bi bi-4-circle-fill fs-2 text-primary"></i>
+                <h6 class="mt-2">Modelo Pronto</h6>
+                <small class="text-muted">Use para detectar objetos em novas imagens</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="row">
+    <!-- Training Form -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-gear"></i>
+            Configuracao do Treinamento
+          </h5>
+        </div>
+        <div class="card-body">
+          <form id="trainingForm">
+            <!-- Step 1: Dataset Selection -->
+            <div class="border-start border-primary border-4 ps-3 mb-4">
+              <h6 class="text-primary mb-3">
+                <i class="bi bi-1-circle-fill"></i>
+                Escolha seu Dataset
+              </h6>
+              <div class="row">
+                <div class="col-md-8">
+                  <label for="datasetSelect" class="form-label fw-bold">
+                    <i class="bi bi-collection"></i>
+                    Dataset de Treinamento *
+                  </label>
+                  <select class="form-select form-select-lg" id="datasetSelect" name="dataset_id" required>
+                    <option value=""> Selecione um dataset...</option>
+                  </select>
+                  <div class="form-text">
+                    <i class="bi bi-info-circle text-primary"></i>
+                    O dataset contem as imagens e anotacoes que a IA usa para aprender
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label fw-bold">Nao tem dataset?</label>
+                  <div class="d-grid">
+                    <a href="{{ url_for('ui.create_dataset_page') }}" class="btn btn-outline-success">
+                      <i class="bi bi-plus-circle"></i>
+                      Criar Novo Dataset
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2: Model Configuration -->
+            <div class="border-start border-success border-4 ps-3 mb-4">
+              <h6 class="text-success mb-3">
+                <i class="bi bi-2-circle-fill"></i>
+                Configuracoes do Modelo
+              </h6>
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="mb-3">
+                    <label for="modelPreset" class="form-label fw-bold">
+                      <i class="bi bi-list-check"></i>
+                      Modelos Disponiveis
+                    </label>
+                    <select class="form-select" id="modelPreset">
+                      <option value="">Selecionar da lista...</option>
+                      <optgroup label="YOLOv8 Detect">
+                        <option value="yolov8n.pt">yolov8n.pt</option>
+                        <option value="yolov8s.pt">yolov8s.pt</option>
+                        <option value="yolov8m.pt">yolov8m.pt</option>
+                        <option value="yolov8l.pt">yolov8l.pt</option>
+                        <option value="yolov8x.pt">yolov8x.pt</option>
+                      </optgroup>
+                      <optgroup label="YOLOv8 Seg">
+                        <option value="yolov8n-seg.pt">yolov8n-seg.pt</option>
+                        <option value="yolov8s-seg.pt">yolov8s-seg.pt</option>
+                        <option value="yolov8m-seg.pt">yolov8m-seg.pt</option>
+                        <option value="yolov8l-seg.pt">yolov8l-seg.pt</option>
+                        <option value="yolov8x-seg.pt">yolov8x-seg.pt</option>
+                      </optgroup>
+                      <optgroup label="YOLOv8 Pose">
+                        <option value="yolov8n-pose.pt">yolov8n-pose.pt</option>
+                        <option value="yolov8s-pose.pt">yolov8s-pose.pt</option>
+                        <option value="yolov8m-pose.pt">yolov8m-pose.pt</option>
+                        <option value="yolov8l-pose.pt">yolov8l-pose.pt</option>
+                        <option value="yolov8x-pose.pt">yolov8x-pose.pt</option>
+                      </optgroup>
+                      <optgroup label="YOLOv8 Classify">
+                        <option value="yolov8n-cls.pt">yolov8n-cls.pt</option>
+                        <option value="yolov8s-cls.pt">yolov8s-cls.pt</option>
+                        <option value="yolov8m-cls.pt">yolov8m-cls.pt</option>
+                        <option value="yolov8l-cls.pt">yolov8l-cls.pt</option>
+                        <option value="yolov8x-cls.pt">yolov8x-cls.pt</option>
+                      </optgroup>
+                      <optgroup label="YOLOv8 P6">
+                        <option value="yolov8n-p6.pt">yolov8n-p6.pt</option>
+                        <option value="yolov8s-p6.pt">yolov8s-p6.pt</option>
+                        <option value="yolov8m-p6.pt">yolov8m-p6.pt</option>
+                        <option value="yolov8l-p6.pt">yolov8l-p6.pt</option>
+                        <option value="yolov8x-p6.pt">yolov8x-p6.pt</option>
+                      </optgroup>
+                      <optgroup label="YOLOv5">
+                        <option value="yolov5n.pt">yolov5n.pt</option>
+                        <option value="yolov5s.pt">yolov5s.pt</option>
+                        <option value="yolov5m.pt">yolov5m.pt</option>
+                        <option value="yolov5l.pt">yolov5l.pt</option>
+                        <option value="yolov5x.pt">yolov5x.pt</option>
+                      </optgroup>
+                      <optgroup label="YOLOv5 P6">
+                        <option value="yolov5n6.pt">yolov5n6.pt</option>
+                        <option value="yolov5s6.pt">yolov5s6.pt</option>
+                        <option value="yolov5m6.pt">yolov5m6.pt</option>
+                        <option value="yolov5l6.pt">yolov5l6.pt</option>
+                        <option value="yolov5x6.pt">yolov5x6.pt</option>
+                      </optgroup>
+                      <optgroup label="YOLOv3">
+                        <option value="yolov3.pt">yolov3.pt</option>
+                        <option value="yolov3-spp.pt">yolov3-spp.pt</option>
+                        <option value="yolov3-tiny.pt">yolov3-tiny.pt</option>
+                      </optgroup>
+                      <optgroup label="YOLO-NAS">
+                        <option value="yolo_nas_s.pt">yolo_nas_s.pt</option>
+                        <option value="yolo_nas_m.pt">yolo_nas_m.pt</option>
+                        <option value="yolo_nas_l.pt">yolo_nas_l.pt</option>
+                      </optgroup>
+                    </select>
+                    <small class="text-muted">Lista de modelos oficiais e modelos locais ja baixados.</small>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="mb-3">
+                    <label for="device" class="form-label fw-bold">
+                      <i class="bi bi-lightning-charge"></i>
+                      Dispositivo
+                    </label>
+                    <select class="form-select" id="device" name="device">
+                      <option value="auto" selected>Automatico (recomendado)</option>
+                      <option value="cuda">GPU (NVIDIA/AMD via CUDA/ROCm)</option>
+                      <option value="xpu">GPU Intel (XPU)</option>
+                      <option value="mps">GPU Apple Silicon (MPS)</option>
+                      <option value="cpu">CPU</option>
+                    </select>
+                    <small class="text-muted">Escolha o backend de processamento. Se indisponivel, usa CPU.</small>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <div class="mb-3">
+                    <label for="modelName" class="form-label fw-bold">
+                      <i class="bi bi-box"></i>
+                      Nome/Caminho do Modelo (Opcional)
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="modelName"
+                      name="model_name"
+                      placeholder="Ex.: yolov8n.pt, yolo26n.pt ou C:\\modelos\\yolo26n.pt"
+                    >
+                    <div id="modelCheckStatus" class="form-text mt-2"></div>
+                    <div class="d-flex gap-2 mt-2">
+                      <button type="button" class="btn btn-outline-secondary btn-sm" id="checkModelBtn">
+                        <i class="bi bi-search"></i> Verificar Modelo
+                      </button>
+                      <button type="button" class="btn btn-outline-primary btn-sm" id="downloadModelBtn" style="display: none;">
+                        <i class="bi bi-download"></i> Baixar Modelo
+                      </button>
+                    </div>
+                    <small class="text-muted">Se vazio, o sistema usa o padrao recomendado para deteccao.</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3: Training Parameters -->
+            <div class="border-start border-warning border-4 ps-3 mb-4">
+              <h6 class="text-warning mb-3">
+                <i class="bi bi-3-circle-fill"></i>
+                Parametros de Treinamento
+              </h6>
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="mb-3">
+                    <label for="epochs" class="form-label fw-bold">
+                      <i class="bi bi-repeat"></i>
+                      Epocas (Ciclos de Aprendizado)
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text"></span>
+                      <input type="number" class="form-control" id="epochs" name="epochs" value="100" min="10" max="1000">
+                      <span class="input-group-text">ciclos</span>
+                    </div>
+                    <small class="text-muted">Recomendado: 100-300 para a maioria dos casos</small>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="mb-3">
+                    <label for="batchSize" class="form-label fw-bold">
+                      <i class="bi bi-stack"></i>
+                      Batch Size (Imagens por Vez)
+                    </label>
+                    <select class="form-select" id="batchSize" name="batch_size">
+                      <option value="8"> 8 - Pouca memoria</option>
+                      <option value="16" selected> 16 - Padrao recomendado</option>
+                      <option value="32"> 32 - Memoria media</option>
+                      <option value="64"> 64 - Muita memoria</option>
+                    </select>
+                    <small class="text-muted">Quantas imagens processar por vez</small>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="mb-3">
+                    <label for="imgSize" class="form-label fw-bold">
+                      <i class="bi bi-aspect-ratio"></i>
+                      Tamanho da Imagem
+                    </label>
+                    <select class="form-select" id="imgSize" name="img_size">
+                      <option value="416">416x416 - Rapido</option>
+                      <option value="512">512x512 - Equilibrado</option>
+                      <option value="640" selected>640x640 - Recomendado</option>
+                      <option value="800">800x800 - Alta qualidade</option>
+                    </select>
+                    <small class="text-muted">Resolucao das imagens durante treino</small>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="mb-3">
+                    <label for="learningRate" class="form-label fw-bold">
+                      <i class="bi bi-speedometer2"></i>
+                      Taxa de Aprendizado
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text"></span>
+                      <input type="number" class="form-control" id="learningRate" name="lr" value="0.01" step="0.001" min="0.001" max="1">
+                    </div>
+                    <small class="text-muted">Velocidade com que a IA aprende (0.01 ideal)</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 4: Advanced Options -->
+            <div class="border-start border-info border-4 ps-3 mb-4">
+              <h6 class="text-info mb-3">
+                <i class="bi bi-4-circle-fill"></i>
+                Configuracoes Avancadas
+              </h6>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" role="switch" id="saveCheckpoints" name="save_checkpoints" checked>
+                    <label class="form-check-label" for="saveCheckpoints">
+                      <strong> Salvar Checkpoints</strong>
+                      <br><small class="text-muted">Salva o progresso durante o treino</small>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" role="switch" id="useAugmentation" name="use_augmentation" checked>
+                    <label class="form-check-label" for="useAugmentation">
+                      <strong> Augmentacao de Dados</strong>
+                      <br><small class="text-muted">Cria variacoes das imagens</small>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="card bg-success text-white">
+              <div class="card-body text-center">
+                <h5 class="card-title">
+                  <i class="bi bi-rocket"></i>
+                  Pronto para Treinar!
+                </h5>
+                <p class="card-text mb-4">
+                  Todas as configuracoes estao definidas. O treinamento pode levar de alguns minutos a varias horas.
+                </p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                  <button type="submit" class="btn btn-light btn-lg px-5" id="startTrainingBtn">
+                    <i class="bi bi-play-circle-fill"></i>
+                    Iniciar Treinamento Agora
+                  </button>
+                  <button type="button" class="btn btn-outline-light" onclick="resetForm()">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    Limpar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
 
-    <!-- Info Card -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card bg-primary bg-opacity-10 border-primary">
-                <div class="card-body">
-                    <h5 class="card-title text-primary">
-                        <i class="bi bi-lightbulb"></i>
-                        Como funciona o treinamento?
-                    </h5>
-                    <p class="card-text mb-3">
-                        O treinamento  o processo onde a inteligncia artificial aprende a reconhecer objetos usando seu dataset. 
-                        Como ensinar uma criana: voc mostra exemplos e a IA aprende os padres.
-                    </p>
-                    <div class="row">
-                        <div class="col-md-3 text-center">
-                            <div class="p-3">
-                                <i class="bi bi-1-circle-fill fs-2 text-primary"></i>
-                                <h6 class="mt-2">Selecionar Dataset</h6>
-                                <small class="text-muted">Escolha as imagens que a IA vai aprender</small>
-                            </div>
-                        </div>
-                        <div class="col-md-3 text-center">
-                            <div class="p-3">
-                                <i class="bi bi-2-circle-fill fs-2 text-primary"></i>
-                                <h6 class="mt-2">Configurar Modelo</h6>
-                                <small class="text-muted">Defina o tipo e preciso do modelo</small>
-                            </div>
-                        </div>
-                        <div class="col-md-3 text-center">
-                            <div class="p-3">
-                                <i class="bi bi-3-circle-fill fs-2 text-primary"></i>
-                                <h6 class="mt-2">Aguardar Treino</h6>
-                                <small class="text-muted">A IA processa e aprende sozinha</small>
-                            </div>
-                        </div>
-                        <div class="col-md-3 text-center">
-                            <div class="p-3">
-                                <i class="bi bi-4-circle-fill fs-2 text-primary"></i>
-                                <h6 class="mt-2">Modelo Pronto</h6>
-                                <small class="text-muted">Use para detectar objetos em novas imagens</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Training Status -->
+      <div class="card border-primary mb-3">
+        <div class="card-header bg-primary text-white">
+          <h6 class="mb-0">
+            <i class="bi bi-activity"></i>
+            Status dos Treinamentos
+          </h6>
         </div>
+        <div class="card-body">
+          <div id="trainingStatus">
+            <div class="text-muted text-center py-3">
+              <i class="bi bi-cpu display-4 text-muted"></i>
+              <div class="mt-2">Nenhum treinamento ativo</div>
+              <small>Os treinamentos em andamento aparecerao aqui</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Monitor -->
+      <div class="card border-success mb-3">
+        <div class="card-header bg-success text-white">
+          <h6 class="mb-0">
+            <i class="bi bi-cpu"></i>
+            Monitor do Sistema
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-2">
+            <div class="col-6">
+              <div class="text-center p-3 bg-light rounded">
+                <div class="fw-bold text-primary h4" id="cpuUsage">-</div>
+                <div class="small text-muted">CPU</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="text-center p-3 bg-light rounded">
+                <div class="fw-bold text-info h4" id="memoryUsage">-</div>
+                <div class="small text-muted">RAM</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="text-center p-3 bg-light rounded">
+                <div class="fw-bold text-warning h4" id="diskUsage">-</div>
+                <div class="small text-muted">Disco</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="text-center p-3 bg-light rounded">
+                <div class="fw-bold text-success h4" id="gpuStatus">-</div>
+                <div class="small text-muted">GPU</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Guide -->
+      <div class="card border-info mb-3">
+        <div class="card-header bg-info text-white">
+          <h6 class="mb-0">
+            <i class="bi bi-question-circle"></i>
+            Guia Rapido
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="accordion accordion-flush" id="tipsAccordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tip1">
+                  <i class="bi bi-lightbulb me-2"></i>
+                  Primeira vez
+                </button>
+              </h2>
+              <div id="tip1" class="accordion-collapse collapse" data-bs-parent="#tipsAccordion">
+                <div class="accordion-body">
+                  Use as configuracoes padrao! Elas funcionam bem para a maioria dos casos.
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tip2">
+                  <i class="bi bi-clock me-2"></i>
+                  Tempo esperado
+                </button>
+              </h2>
+              <div id="tip2" class="accordion-collapse collapse" data-bs-parent="#tipsAccordion">
+                <div class="accordion-body">
+                  Dataset pequeno (100 imgs): 10-30 min<br>
+                  Dataset medio (500 imgs): 1-3 horas<br>
+                  Dataset grande (1000+ imgs): 3+ horas
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tip3">
+                  <i class="bi bi-exclamation-triangle me-2"></i>
+                  Dica importante
+                </button>
+              </h2>
+              <div id="tip3" class="accordion-collapse collapse" data-bs-parent="#tipsAccordion">
+                <div class="accordion-body">
+                  Nao feche o navegador durante o treinamento! Voce pode acompanhar o progresso em tempo real.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="card border-warning">
+        <div class="card-header bg-warning text-dark">
+          <h6 class="mb-0">
+            <i class="bi bi-graph-up"></i>
+            Estatisticas
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-4">
+              <div class="h4 text-primary" id="totalTrainings">-</div>
+              <small class="text-muted">Total</small>
+            </div>
+            <div class="col-4">
+              <div class="h4 text-success" id="completedTrainings">-</div>
+              <small class="text-muted">Completos</small>
+            </div>
+            <div class="col-4">
+              <div class="h4 text-info" id="runningTrainings">-</div>
+              <small class="text-muted">Ativos</small>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <!-- Main Content -->
-    <div class="row">
-        <!-- Training Form -->
-        <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-gear"></i>
-                        Configurao do Treinamento
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <form id="trainingForm">
-                        <!-- Step 1: Dataset Selection -->
-                        <div class="border-start border-primary border-4 ps-3 mb-4">
-                            <h6 class="text-primary mb-3">
-                                <i class="bi bi-1-circle-fill"></i>
-                                Escolha seu Dataset
-                            </h6>
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <label for="datasetSelect" class="form-label fw-bold">
-                                        <i class="bi bi-collection"></i>
-                                        Dataset de Treinamento *
-                                    </label>
-                                    <select class="form-select form-select-lg" id="datasetSelect" name="dataset_id" required>
-                                        <option value=""> Selecione um dataset...</option>
-                                    </select>
-                                    <div class="form-text">
-                                        <i class="bi bi-info-circle text-primary"></i>
-                                        O dataset contm as imagens e anotaes que a IA usar para aprender
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">No tem dataset?</label>
-                                    <div class="d-grid">
-                                        <a href="{{ url_for('ui.create_dataset_page') }}" class="btn btn-outline-success">
-                                            <i class="bi bi-plus-circle"></i>
-                                            Criar Novo Dataset
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Step 2: Model Configuration -->
-                        <div class="border-start border-success border-4 ps-3 mb-4">
-                            <h6 class="text-success mb-3">
-                                <i class="bi bi-2-circle-fill"></i>
-                                Configuracoes do Modelo
-                            </h6>
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="mb-3">
-                                        <label for="modelPreset" class="form-label fw-bold">
-                                            <i class="bi bi-list-check"></i>
-                                            Modelos Disponiveis
-                                        </label>
-                                        <select class="form-select" id="modelPreset">
-                                            <option value="">Selecionar da lista...</option>
-                                        </select>
-                                        <small class="text-muted">Lista de modelos oficiais e modelos locais ja baixados.</small>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="mb-3">
-                                        <label for="device" class="form-label fw-bold">
-                                            <i class="bi bi-lightning-charge"></i>
-                                            Dispositivo
-                                        </label>
-                                        <select class="form-select" id="device" name="device">
-                                            <option value="auto" selected>Automatico (recomendado)</option>
-                                            <option value="cuda">GPU (NVIDIA/AMD via CUDA/ROCm)</option>
-                                            <option value="xpu">GPU Intel (XPU)</option>
-                                            <option value="mps">GPU Apple Silicon (MPS)</option>
-                                            <option value="cpu">CPU</option>
-                                        </select>
-                                        <small class="text-muted">Escolha o backend de processamento. Se indisponivel, cai para CPU.</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="mb-3">
-                                        <label for="modelName" class="form-label fw-bold">
-                                            <i class="bi bi-box"></i>
-                                            Nome/Caminho do Modelo (Opcional)
-                                        </label>
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            id="modelName"
-                                            name="model_name"
-                                            placeholder="Ex.: yolov8n.pt, yolo26n.pt ou C:\\modelos\\yolo26n.pt"
-                                        >
-                                        <div id="modelCheckStatus" class="form-text mt-2"></div>
-                                        <div class="d-flex gap-2 mt-2">
-                                            <button type="button" class="btn btn-outline-secondary btn-sm" id="checkModelBtn">
-                                                <i class="bi bi-search"></i> Verificar Modelo
-                                            </button>
-                                            <button type="button" class="btn btn-outline-primary btn-sm" id="downloadModelBtn" style="display: none;">
-                                                <i class="bi bi-download"></i> Baixar Modelo
-                                            </button>
-                                        </div>
-                                        <small class="text-muted">Se vazio, o sistema usa o padrao recomendado para deteccao.</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Step 3: Training Parameters -->
-                        <div class="border-start border-warning border-4 ps-3 mb-4">
-                            <h6 class="text-warning mb-3">
-                                <i class="bi bi-3-circle-fill"></i>
-                                Parmetros de Treinamento
-                            </h6>
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="mb-3">
-                                        <label for="epochs" class="form-label fw-bold">
-                                            <i class="bi bi-repeat"></i>
-                                            pocas (Ciclos de Aprendizado)
-                                        </label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"></span>
-                                            <input type="number" class="form-control" id="epochs" name="epochs" value="100" min="10" max="1000">
-                                            <span class="input-group-text">ciclos</span>
-                                        </div>
-                                        <small class="text-muted">Recomendado: 100-300 para a maioria dos casos</small>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="mb-3">
-                                        <label for="batchSize" class="form-label fw-bold">
-                                            <i class="bi bi-stack"></i>
-                                            Batch Size (Imagens por Vez)
-                                        </label>
-                                        <select class="form-select" id="batchSize" name="batch_size">
-                                            <option value="8"> 8 - Pouca memria</option>
-                                            <option value="16" selected> 16 - Padro recomendado</option>
-                                            <option value="32"> 32 - Memria mdia</option>
-                                            <option value="64"> 64 - Muita memria</option>
-                                        </select>
-                                        <small class="text-muted">Quantas imagens processar por vez</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="mb-3">
-                                        <label for="imgSize" class="form-label fw-bold">
-                                            <i class="bi bi-aspect-ratio"></i>
-                                            Tamanho da Imagem
-                                        </label>
-                                        <select class="form-select" id="imgSize" name="img_size">
-                                            <option value="416">416x416 - Rpido</option>
-                                            <option value="512">512x512 - Equilibrado</option>
-                                            <option value="640" selected>640x640 - Recomendado</option>
-                                            <option value="800">800x800 - Alta qualidade</option>
-                                        </select>
-                                        <small class="text-muted">Resoluo das imagens durante treino</small>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="mb-3">
-                                        <label for="learningRate" class="form-label fw-bold">
-                                            <i class="bi bi-speedometer2"></i>
-                                            Taxa de Aprendizado
-                                        </label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"></span>
-                                            <input type="number" class="form-control" id="learningRate" name="lr" value="0.01" step="0.001" min="0.001" max="1">
-                                        </div>
-                                        <small class="text-muted">Velocidade com que a IA aprende (0.01  ideal)</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Step 4: Advanced Options -->
-                        <div class="border-start border-info border-4 ps-3 mb-4">
-                            <h6 class="text-info mb-3">
-                                <i class="bi bi-4-circle-fill"></i>
-                                Configuraes Avanadas
-                            </h6>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-check form-switch mb-3">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="saveCheckpoints" name="save_checkpoints" checked>
-                                        <label class="form-check-label" for="saveCheckpoints">
-                                            <strong> Salvar Checkpoints</strong>
-                                            <br><small class="text-muted">Salva o progresso durante o treino</small>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-check form-switch mb-3">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="useAugmentation" name="use_augmentation" checked>
-                                        <label class="form-check-label" for="useAugmentation">
-                                            <strong> Augmentao de Dados</strong>
-                                            <br><small class="text-muted">Cria variaes das imagens</small>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <div class="card bg-success text-white">
-                            <div class="card-body text-center">
-                                <h5 class="card-title">
-                                    <i class="bi bi-rocket"></i>
-                                    Pronto para Treinar!
-                                </h5>
-                                <p class="card-text mb-4">
-                                    Todas as configuraes esto definidas. O treinamento pode levar de alguns minutos a vrias horas.
-                                </p>
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                                    <button type="submit" class="btn btn-light btn-lg px-5" id="startTrainingBtn">
-                                        <i class="bi bi-play-circle-fill"></i>
-                                        Iniciar Treinamento Agora
-                                    </button>
-                                    <button type="button" class="btn btn-outline-light" onclick="resetForm()">
-                                        <i class="bi bi-arrow-clockwise"></i>
-                                        Limpar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="col-lg-4">
-            <!-- Training Status -->
-            <div class="card border-primary mb-3">
-                <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0">
-                        <i class="bi bi-activity"></i>
-                        Status dos Treinamentos
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div id="trainingStatus">
-                        <div class="text-muted text-center py-3">
-                            <i class="bi bi-cpu display-4 text-muted"></i>
-                            <div class="mt-2">Nenhum treinamento ativo</div>
-                            <small>Os treinamentos em andamento aparecero aqui</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- System Monitor -->
-            <div class="card border-success mb-3">
-                <div class="card-header bg-success text-white">
-                    <h6 class="mb-0">
-                        <i class="bi bi-cpu"></i>
-                        Monitor do Sistema
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <div class="text-center p-3 bg-light rounded">
-                                <div class="fw-bold text-primary h4" id="cpuUsage">-</div>
-                                <div class="small text-muted">CPU</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-center p-3 bg-light rounded">
-                                <div class="fw-bold text-info h4" id="memoryUsage">-</div>
-                                <div class="small text-muted">RAM</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-center p-3 bg-light rounded">
-                                <div class="fw-bold text-warning h4" id="diskUsage">-</div>
-                                <div class="small text-muted">Disco</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-center p-3 bg-light rounded">
-                                <div class="fw-bold text-success h4" id="gpuStatus">-</div>
-                                <div class="small text-muted">GPU</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Guide -->
-            <div class="card border-info mb-3">
-                <div class="card-header bg-info text-white">
-                    <h6 class="mb-0">
-                        <i class="bi bi-question-circle"></i>
-                        Guia Rpido
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="accordion accordion-flush" id="tipsAccordion">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tip1">
-                                    <i class="bi bi-lightbulb me-2"></i>
-                                    Primeira vez?
-                                </button>
-                            </h2>
-                            <div id="tip1" class="accordion-collapse collapse" data-bs-parent="#tipsAccordion">
-                                <div class="accordion-body">
-                                    Use as configuraes padro! Elas funcionam bem para a maioria dos casos.
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tip2">
-                                    <i class="bi bi-clock me-2"></i>
-                                    Tempo esperado
-                                </button>
-                            </h2>
-                            <div id="tip2" class="accordion-collapse collapse" data-bs-parent="#tipsAccordion">
-                                <div class="accordion-body">
-                                     Dataset pequeno (100 imgs): 10-30 min<br>
-                                     Dataset mdio (500 imgs): 1-3 horas<br>
-                                     Dataset grande (1000+ imgs): 3+ horas
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tip3">
-                                    <i class="bi bi-exclamation-triangle me-2"></i>
-                                    Dica importante
-                                </button>
-                            </h2>
-                            <div id="tip3" class="accordion-collapse collapse" data-bs-parent="#tipsAccordion">
-                                <div class="accordion-body">
-                                    No feche o navegador durante o treinamento! Voc pode acompanhar o progresso em tempo real.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stats -->
-            <div class="card border-warning">
-                <div class="card-header bg-warning text-dark">
-                    <h6 class="mb-0">
-                        <i class="bi bi-graph-up"></i>
-                        Estatsticas
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-4">
-                            <div class="h4 text-primary" id="totalTrainings">-</div>
-                            <small class="text-muted">Total</small>
-                        </div>
-                        <div class="col-4">
-                            <div class="h4 text-success" id="completedTrainings">-</div>
-                            <small class="text-muted">Completos</small>
-                        </div>
-                        <div class="col-4">
-                            <div class="h4 text-info" id="runningTrainings">-</div>
-                            <small class="text-muted">Ativos</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 {% endblock %}
 
@@ -464,373 +523,361 @@
 <script>
 let socket = null;
 const modelPresetGroups = [
-    { label: 'YOLOv8 Detect', items: ['yolov8n.pt', 'yolov8s.pt', 'yolov8m.pt', 'yolov8l.pt', 'yolov8x.pt'] },
-    { label: 'YOLOv8 Seg', items: ['yolov8n-seg.pt', 'yolov8s-seg.pt', 'yolov8m-seg.pt', 'yolov8l-seg.pt', 'yolov8x-seg.pt'] },
-    { label: 'YOLOv8 Pose', items: ['yolov8n-pose.pt', 'yolov8s-pose.pt', 'yolov8m-pose.pt', 'yolov8l-pose.pt', 'yolov8x-pose.pt'] },
-    { label: 'YOLOv8 Classify', items: ['yolov8n-cls.pt', 'yolov8s-cls.pt', 'yolov8m-cls.pt', 'yolov8l-cls.pt', 'yolov8x-cls.pt'] },
-    { label: 'YOLOv8 P6', items: ['yolov8n-p6.pt', 'yolov8s-p6.pt', 'yolov8m-p6.pt', 'yolov8l-p6.pt', 'yolov8x-p6.pt'] },
-    { label: 'YOLOv5', items: ['yolov5n.pt', 'yolov5s.pt', 'yolov5m.pt', 'yolov5l.pt', 'yolov5x.pt'] },
-    { label: 'YOLOv5 P6', items: ['yolov5n6.pt', 'yolov5s6.pt', 'yolov5m6.pt', 'yolov5l6.pt', 'yolov5x6.pt'] },
-    { label: 'YOLOv3', items: ['yolov3.pt', 'yolov3-spp.pt', 'yolov3-tiny.pt'] },
-    { label: 'YOLO-NAS', items: ['yolo_nas_s.pt', 'yolo_nas_m.pt', 'yolo_nas_l.pt'] },
+  { label: 'YOLOv8 Detect', items: ['yolov8n.pt', 'yolov8s.pt', 'yolov8m.pt', 'yolov8l.pt', 'yolov8x.pt'] },
+  { label: 'YOLOv8 Seg', items: ['yolov8n-seg.pt', 'yolov8s-seg.pt', 'yolov8m-seg.pt', 'yolov8l-seg.pt', 'yolov8x-seg.pt'] },
+  { label: 'YOLOv8 Pose', items: ['yolov8n-pose.pt', 'yolov8s-pose.pt', 'yolov8m-pose.pt', 'yolov8l-pose.pt', 'yolov8x-pose.pt'] },
+  { label: 'YOLOv8 Classify', items: ['yolov8n-cls.pt', 'yolov8s-cls.pt', 'yolov8m-cls.pt', 'yolov8l-cls.pt', 'yolov8x-cls.pt'] },
+  { label: 'YOLOv8 P6', items: ['yolov8n-p6.pt', 'yolov8s-p6.pt', 'yolov8m-p6.pt', 'yolov8l-p6.pt', 'yolov8x-p6.pt'] },
+  { label: 'YOLOv5', items: ['yolov5n.pt', 'yolov5s.pt', 'yolov5m.pt', 'yolov5l.pt', 'yolov5x.pt'] },
+  { label: 'YOLOv5 P6', items: ['yolov5n6.pt', 'yolov5s6.pt', 'yolov5m6.pt', 'yolov5l6.pt', 'yolov5x6.pt'] },
+  { label: 'YOLOv3', items: ['yolov3.pt', 'yolov3-spp.pt', 'yolov3-tiny.pt'] },
+  { label: 'YOLO-NAS', items: ['yolo_nas_s.pt', 'yolo_nas_m.pt', 'yolo_nas_l.pt'] },
 ];
 
 document.addEventListener('DOMContentLoaded', function() {
-    loadDatasets();
-    loadTrainingStats(); // Reativado com rota correta
-    // setupWebSocket(); // Comentado temporariamente at WebSocket estar disponvel
-    // updateSystemInfo(); // Comentado temporariamente at API estar disponvel
-    
-    // Initialize Bootstrap tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-    
-    document.getElementById('trainingForm').addEventListener('submit', handleTrainingSubmit);
-    initializeModelPresetOptions();
-    document.getElementById('checkModelBtn').addEventListener('click', checkModelAvailability);
-    document.getElementById('downloadModelBtn').addEventListener('click', downloadSelectedModel);
-    document.getElementById('modelPreset').addEventListener('change', handleModelPresetChange);
-    document.getElementById('modelName').addEventListener('blur', function() {
-        if (this.value.trim()) {
-            checkModelAvailability();
-        }
-    });
-    applyDefaultModelSuggestion();
+  loadDatasets();
+  loadTrainingStats(); // Reativado com rota correta
+  // setupWebSocket(); // Comentado temporariamente ate WebSocket estar disponivel
+  // updateSystemInfo(); // Comentado temporariamente ate API estar disponivel
+  
+  // Initialize Bootstrap tooltips
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+  
+  document.getElementById('trainingForm').addEventListener('submit', handleTrainingSubmit);
+  initializeModelPresetOptions();
+  document.getElementById('checkModelBtn').addEventListener('click', checkModelAvailability);
+  document.getElementById('downloadModelBtn').addEventListener('click', downloadSelectedModel);
+  document.getElementById('modelPreset').addEventListener('change', handleModelPresetChange);
+  document.getElementById('modelName').addEventListener('blur', function() {
+    if (this.value.trim()) {
+      checkModelAvailability();
+    }
+  });
+  applyDefaultModelSuggestion();
 });
 
 function initializeModelPresetOptions() {
-    const presetSelect = document.getElementById('modelPreset');
-    if (!presetSelect) return;
-
-    modelPresetGroups.forEach(group => {
-        const optgroup = document.createElement('optgroup');
-        optgroup.label = group.label;
-        group.items.forEach(modelName => {
-            const option = document.createElement('option');
-            option.value = modelName;
-            option.textContent = modelName;
-            optgroup.appendChild(option);
-        });
-        presetSelect.appendChild(optgroup);
-    });
-
-    loadLocalModelPresets();
+  const presetSelect = document.getElementById('modelPreset');
+  if (!presetSelect) return;
+  // Base model presets are now rendered server-side in the HTML.
+  loadLocalModelPresets();
 }
 
 function loadLocalModelPresets() {
-    const presetSelect = document.getElementById('modelPreset');
-    if (!presetSelect) return;
+  const presetSelect = document.getElementById('modelPreset');
+  if (!presetSelect) return;
 
-    fetch('/api/models/list')
-        .then(response => response.json())
-        .then(data => {
-            if (!data.models || data.models.length === 0) return;
-            const separator = document.createElement('option');
-            separator.disabled = true;
-            separator.textContent = '----- Modelos locais -----';
-            presetSelect.appendChild(separator);
-            data.models.forEach(model => {
-                const option = document.createElement('option');
-                option.value = model.path;
-                option.textContent = `Local: ${model.name}`;
-                presetSelect.appendChild(option);
-            });
-        })
-        .catch(error => console.warn('Nao foi possivel listar modelos locais:', error));
+  fetch('/api/models/list')
+    .then(response => response.json())
+    .then(data => {
+      if (!data.models || data.models.length === 0) return;
+      const separator = document.createElement('option');
+      separator.disabled = true;
+      separator.textContent = '----- Modelos locais -----';
+      presetSelect.appendChild(separator);
+      data.models.forEach(model => {
+        const option = document.createElement('option');
+        option.value = model.path;
+        option.textContent = `Local: ${model.name}`;
+        presetSelect.appendChild(option);
+      });
+    })
+    .catch(error => console.warn('Nao foi possivel listar modelos locais:', error));
 }
 
 function handleModelPresetChange() {
-    const selectedModel = document.getElementById('modelPreset').value;
-    if (!selectedModel) return;
-    document.getElementById('modelName').value = selectedModel;
-    checkModelAvailability();
+  const selectedModel = document.getElementById('modelPreset').value;
+  if (!selectedModel) return;
+  document.getElementById('modelName').value = selectedModel;
+  checkModelAvailability();
 }
 
 function applyDefaultModelSuggestion() {
-    const modelNameInput = document.getElementById('modelName');
-    if (!modelNameInput || modelNameInput.value.trim()) return;
-    modelNameInput.value = 'yolov8m.pt';
+  const modelNameInput = document.getElementById('modelName');
+  if (!modelNameInput || modelNameInput.value.trim()) return;
+  modelNameInput.value = 'yolov8m.pt';
 }
 
 function inferTaskTypeFromModelName(modelName) {
-    const lower = (modelName || '').toLowerCase();
-    if (lower.includes('-seg')) return 'segment';
-    if (lower.includes('-cls')) return 'classify';
-    if (lower.includes('-pose')) return 'pose';
-    return 'detect';
+  const lower = (modelName || '').toLowerCase();
+  if (lower.includes('-seg')) return 'segment';
+  if (lower.includes('-cls')) return 'classify';
+  if (lower.includes('-pose')) return 'pose';
+  return 'detect';
 }
 
 function setModelStatus(message, type = 'muted') {
-    const statusEl = document.getElementById('modelCheckStatus');
-    const classes = {
-        muted: 'text-muted',
-        success: 'text-success',
-        warning: 'text-warning',
-        danger: 'text-danger',
-        info: 'text-primary'
-    };
-    statusEl.className = `form-text mt-2 ${classes[type] || classes.muted}`;
-    statusEl.textContent = message;
+  const statusEl = document.getElementById('modelCheckStatus');
+  const classes = {
+    muted: 'text-muted',
+    success: 'text-success',
+    warning: 'text-warning',
+    danger: 'text-danger',
+    info: 'text-primary'
+  };
+  statusEl.className = `form-text mt-2 ${classes[type] || classes.muted}`;
+  statusEl.textContent = message;
 }
 
 function getModelCheckPayload() {
-    return { model_name: document.getElementById('modelName').value.trim() };
+  return { model_name: document.getElementById('modelName').value.trim() };
 }
 
 async function checkModelAvailability() {
-    const modelName = document.getElementById('modelName').value.trim();
-    const downloadBtn = document.getElementById('downloadModelBtn');
-    if (!modelName) {
-        setModelStatus('Informe um modelo para verificar.', 'muted');
-        downloadBtn.style.display = 'none';
-        return;
-    }
-
-    setModelStatus('Verificando modelo...', 'info');
+  const modelName = document.getElementById('modelName').value.trim();
+  const downloadBtn = document.getElementById('downloadModelBtn');
+  if (!modelName) {
+    setModelStatus('Informe um modelo para verificar.', 'muted');
     downloadBtn.style.display = 'none';
-    try {
-        const response = await fetch('/api/models/check', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(getModelCheckPayload())
-        });
-        const data = await response.json();
-        if (!response.ok) {
-            setModelStatus(data.error || 'Falha ao verificar modelo.', 'danger');
-            return;
-        }
-        if (data.exists) {
-            setModelStatus(`Modelo disponivel: ${data.local_path}`, 'success');
-        } else if (data.downloadable) {
-            setModelStatus('Modelo nao encontrado localmente. Voce pode baixar agora.', 'warning');
-            downloadBtn.style.display = 'inline-block';
-        } else {
-            setModelStatus('Modelo nao encontrado e sem fonte de download conhecida.', 'danger');
-        }
-    } catch (error) {
-        console.error('checkModelAvailability error:', error);
-        setModelStatus('Erro ao verificar o modelo.', 'danger');
+    return;
+  }
+
+  setModelStatus('Verificando modelo...', 'info');
+  downloadBtn.style.display = 'none';
+  try {
+    const response = await fetch('/api/models/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(getModelCheckPayload())
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      setModelStatus(data.error || 'Falha ao verificar modelo.', 'danger');
+      return;
     }
+    if (data.exists) {
+      setModelStatus(`Modelo disponivel: ${data.local_path}`, 'success');
+    } else if (data.downloadable) {
+      setModelStatus('Modelo nao encontrado localmente. Voce pode baixar agora.', 'warning');
+      downloadBtn.style.display = 'inline-block';
+    } else {
+      setModelStatus('Modelo nao encontrado e sem fonte de download conhecida.', 'danger');
+    }
+  } catch (error) {
+    console.error('checkModelAvailability error:', error);
+    setModelStatus('Erro ao verificar o modelo.', 'danger');
+  }
 }
 
 async function downloadSelectedModel() {
-    const modelName = document.getElementById('modelName').value.trim();
-    const downloadBtn = document.getElementById('downloadModelBtn');
-    if (!modelName) {
-        setModelStatus('Informe um modelo para baixar.', 'warning');
-        return;
-    }
+  const modelName = document.getElementById('modelName').value.trim();
+  const downloadBtn = document.getElementById('downloadModelBtn');
+  if (!modelName) {
+    setModelStatus('Informe um modelo para baixar.', 'warning');
+    return;
+  }
 
-    downloadBtn.disabled = true;
-    downloadBtn.innerHTML = '<i class=\"bi bi-hourglass-split\"></i> Baixando...';
-    setModelStatus('Iniciando download do modelo...', 'info');
-    try {
-        const response = await fetch('/api/models/download', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(getModelCheckPayload())
-        });
-        const data = await response.json();
-        if (!response.ok || !data.success) {
-            setModelStatus(data.error || 'Falha ao baixar modelo.', 'danger');
-            return;
-        }
-        document.getElementById('modelName').value = data.local_path;
-        setModelStatus(`Modelo pronto para uso: ${data.local_path}`, 'success');
-        downloadBtn.style.display = 'none';
-    } catch (error) {
-        console.error('downloadSelectedModel error:', error);
-        setModelStatus('Erro durante o download do modelo.', 'danger');
-    } finally {
-        downloadBtn.disabled = false;
-        downloadBtn.innerHTML = '<i class=\"bi bi-download\"></i> Baixar Modelo';
+  downloadBtn.disabled = true;
+  downloadBtn.innerHTML = '<i class=\"bi bi-hourglass-split\"></i> Baixando...';
+  setModelStatus('Iniciando download do modelo...', 'info');
+  try {
+    const response = await fetch('/api/models/download', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(getModelCheckPayload())
+    });
+    const data = await response.json();
+    if (!response.ok || !data.success) {
+      setModelStatus(data.error || 'Falha ao baixar modelo.', 'danger');
+      return;
     }
+    document.getElementById('modelName').value = data.local_path;
+    setModelStatus(`Modelo pronto para uso: ${data.local_path}`, 'success');
+    downloadBtn.style.display = 'none';
+  } catch (error) {
+    console.error('downloadSelectedModel error:', error);
+    setModelStatus('Erro durante o download do modelo.', 'danger');
+  } finally {
+    downloadBtn.disabled = false;
+    downloadBtn.innerHTML = '<i class=\"bi bi-download\"></i> Baixar Modelo';
+  }
 }
 
 function loadDatasets() {
-    fetch('/api/datasets')
-        .then(response => {
-            console.log('Dataset response status:', response.status);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Dataset data received:', data);
-            const select = document.getElementById('datasetSelect');
-            select.innerHTML = '<option value=""> Selecione um dataset...</option>';
-            
-            if (data && data.datasets && data.datasets.length > 0) {
-                data.datasets.forEach(dataset => {
-                    const option = document.createElement('option');
-                    option.value = dataset.id;
-                    option.textContent = ` ${dataset.name}`;
-                    select.appendChild(option);
-                });
-            } else {
-                select.innerHTML += '<option value="" disabled> Nenhum dataset encontrado - Crie um primeiro</option>';
-            }
-        })
-        .catch(error => {
-            console.error('Error loading datasets:', error);
-            const select = document.getElementById('datasetSelect');
-            select.innerHTML = '<option value=""> Erro ao carregar datasets - Verifique o console</option>';
-        });
-}
-
-function loadTrainingStats() {
-    fetch('/api/trainings/stats')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            document.getElementById('totalTrainings').textContent = data.total || 0;
-            document.getElementById('completedTrainings').textContent = data.completed || 0;
-            document.getElementById('runningTrainings').textContent = data.running || 0;
-        })
-        .catch(error => {
-            console.warn('Training stats API not available:', error);
-            document.getElementById('totalTrainings').textContent = '0';
-            document.getElementById('completedTrainings').textContent = '0';
-            document.getElementById('runningTrainings').textContent = '0';
-        });
-}
-
-function updateSystemInfo() {
-    fetch('/api/system/info')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            document.getElementById('cpuUsage').textContent = data.cpu_percent ? `${data.cpu_percent}%` : '-';
-            document.getElementById('memoryUsage').textContent = data.memory_percent ? `${data.memory_percent}%` : '-';
-            document.getElementById('diskUsage').textContent = data.disk_percent ? `${data.disk_percent}%` : '-';
-            document.getElementById('gpuStatus').textContent = data.gpu_available ? 'GPU' : 'CPU';
-        })
-        .catch(error => {
-            console.warn('System info API not available:', error);
-            document.getElementById('cpuUsage').textContent = '-';
-            document.getElementById('memoryUsage').textContent = '-';
-            document.getElementById('diskUsage').textContent = '-';
-            document.getElementById('gpuStatus').textContent = '-';
-        });
-}
-
-function setupWebSocket() {
-    // WebSocket setup for real-time updates - opcional
-    try {
-        if (socket) {
-            socket.close();
-        }
-        
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        socket = new WebSocket(`${protocol}//${window.location.host}/ws`);
-        
-        socket.onmessage = function(event) {
-            try {
-                const data = JSON.parse(event.data);
-                if (data.type === 'training_update') {
-                    updateTrainingStatus(data.data);
-                }
-            } catch (error) {
-                console.warn('Error parsing WebSocket message:', error);
-            }
-        };
-        
-        socket.onerror = function(error) {
-            console.warn('WebSocket connection failed:', error);
-        };
-        
-        socket.onclose = function() {
-            console.info('WebSocket connection closed');
-        };
-    } catch (error) {
-        console.warn('WebSocket not available:', error);
-    }
-}
-
-function updateTrainingStatus(data) {
-    const statusDiv = document.getElementById('trainingStatus');
-    if (data.status === 'running') {
-        statusDiv.innerHTML = `
-            <div class="alert alert-info">
-                <h6><i class="bi bi-gear-fill"></i> Treinamento em Andamento</h6>
-                <p>poca: ${data.epoch}/${data.total_epochs}</p>
-                <div class="progress">
-                    <div class="progress-bar" style="width: ${(data.epoch/data.total_epochs*100)}%"></div>
-                </div>
-            </div>
-        `;
-    }
-}
-
-function handleTrainingSubmit(event) {
-    event.preventDefault();
-    
-    const formData = new FormData(event.target);
-    const data = Object.fromEntries(formData);
-    data.task_type = inferTaskTypeFromModelName(data.model_name || '');
-    
-    if (!data.dataset_id) {
-        alert('Por favor, selecione um dataset!');
-        return;
-    }
-    
-    const button = document.getElementById('startTrainingBtn');
-    button.disabled = true;
-    button.innerHTML = '<i class="bi bi-hourglass-split"></i> Iniciando...';
-    
-    fetch('/api/trainings', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    })
+  fetch('/api/datasets')
     .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
+      console.log('Dataset response status:', response.status);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
     })
     .then(data => {
-        if (data.success || data.training_id) {
-            alert('Treinamento criado com sucesso!');
-            const trainingId = data.training_id || data.id;
-            if (trainingId) {
-                window.location.href = `/training/${trainingId}`;
-            } else {
-                window.location.href = '/trainings';
-            }
-        } else {
-            alert('Erro ao criar treinamento: ' + (data.message || 'Erro desconhecido'));
-        }
+      console.log('Dataset data received:', data);
+      const select = document.getElementById('datasetSelect');
+      select.innerHTML = '<option value=""> Selecione um dataset...</option>';
+      
+      if (data && data.datasets && data.datasets.length > 0) {
+        data.datasets.forEach(dataset => {
+          const option = document.createElement('option');
+          option.value = dataset.id;
+          option.textContent = ` ${dataset.name}`;
+          select.appendChild(option);
+        });
+      } else {
+        select.innerHTML += '<option value="" disabled> Nenhum dataset encontrado - Crie um primeiro</option>';
+      }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Erro ao iniciar treinamento: ' + error.message);
-    })
-    .finally(() => {
-        button.disabled = false;
-        button.innerHTML = '<i class="bi bi-play-circle-fill"></i> Iniciar Treinamento Agora';
+      console.error('Error loading datasets:', error);
+      const select = document.getElementById('datasetSelect');
+      select.innerHTML = '<option value=""> Erro ao carregar datasets - Verifique o console</option>';
     });
 }
 
-function resetForm() {
-    document.getElementById('trainingForm').reset();
-    document.getElementById('datasetSelect').value = '';
+function loadTrainingStats() {
+  fetch('/api/trainings/stats')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      document.getElementById('totalTrainings').textContent = data.total || 0;
+      document.getElementById('completedTrainings').textContent = data.completed || 0;
+      document.getElementById('runningTrainings').textContent = data.running || 0;
+    })
+    .catch(error => {
+      console.warn('Training stats API not available:', error);
+      document.getElementById('totalTrainings').textContent = '0';
+      document.getElementById('completedTrainings').textContent = '0';
+      document.getElementById('runningTrainings').textContent = '0';
+    });
 }
 
-// Update system info every 30 seconds - comentado at APIs estarem disponveis
+function updateSystemInfo() {
+  fetch('/api/system/info')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      document.getElementById('cpuUsage').textContent = data.cpu_percent !== undefined ? `${data.cpu_percent}%` : '-';
+      document.getElementById('memoryUsage').textContent = data.memory_percent !== undefined ? `${data.memory_percent}%` : '-';
+      document.getElementById('diskUsage').textContent = data.disk_percent !== undefined ? `${data.disk_percent}%` : '-';
+      document.getElementById('gpuStatus').textContent = data.gpu_available ? 'GPU' : 'CPU';
+    })
+    .catch(error => {
+      console.warn('System info API not available:', error);
+      document.getElementById('cpuUsage').textContent = '-';
+      document.getElementById('memoryUsage').textContent = '-';
+      document.getElementById('diskUsage').textContent = '-';
+      document.getElementById('gpuStatus').textContent = '-';
+    });
+}
+
+function setupWebSocket() {
+  // WebSocket setup for real-time updates - opcional
+  try {
+    if (socket) {
+      socket.close();
+    }
+    
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    socket = new WebSocket(`${protocol}//${window.location.host}/ws`);
+    
+    socket.onmessage = function(event) {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'training_update') {
+          updateTrainingStatus(data.data);
+        }
+      } catch (error) {
+        console.warn('Error parsing WebSocket message:', error);
+      }
+    };
+    
+    socket.onerror = function(error) {
+      console.warn('WebSocket connection failed:', error);
+    };
+    
+    socket.onclose = function() {
+      console.info('WebSocket connection closed');
+    };
+  } catch (error) {
+    console.warn('WebSocket not available:', error);
+  }
+}
+
+function updateTrainingStatus(data) {
+  const statusDiv = document.getElementById('trainingStatus');
+  if (data.status === 'running') {
+    statusDiv.innerHTML = `
+      <div class="alert alert-info">
+        <h6><i class="bi bi-gear-fill"></i> Treinamento em Andamento</h6>
+        <p>Epoca: ${data.epoch}/${data.total_epochs}</p>
+        <div class="progress">
+          <div class="progress-bar" style="width: ${(data.epoch/data.total_epochs*100)}%"></div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function handleTrainingSubmit(event) {
+  event.preventDefault();
+  
+  const formData = new FormData(event.target);
+  const data = Object.fromEntries(formData);
+  data.task_type = inferTaskTypeFromModelName(data.model_name || '');
+  
+  if (!data.dataset_id) {
+    alert('Por favor, selecione um dataset!');
+    return;
+  }
+  
+  const button = document.getElementById('startTrainingBtn');
+  button.disabled = true;
+  button.innerHTML = '<i class="bi bi-hourglass-split"></i> Iniciando...';
+  
+  fetch('/api/trainings', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.success || data.training_id) {
+      alert('Treinamento criado com sucesso!');
+      const trainingId = data.training_id || data.id;
+      if (trainingId) {
+        window.location.href = `/training/${trainingId}`;
+      } else {
+        window.location.href = '/trainings';
+      }
+    } else {
+      alert('Erro ao criar treinamento: ' + (data.message || 'Erro desconhecido'));
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Erro ao iniciar treinamento: ' + error.message);
+  })
+  .finally(() => {
+    button.disabled = false;
+    button.innerHTML = '<i class="bi bi-play-circle-fill"></i> Iniciar Treinamento Agora';
+  });
+}
+
+function resetForm() {
+  document.getElementById('trainingForm').reset();
+  document.getElementById('datasetSelect').value = '';
+}
+
+// Update system info every 30 seconds - comentado ate APIs estarem disponiveis
 // setInterval(updateSystemInfo, 30000);
 // setInterval(loadTrainingStats, 30000);
 </script>
